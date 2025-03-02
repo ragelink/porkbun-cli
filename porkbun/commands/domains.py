@@ -39,6 +39,16 @@ def account():
     """Account management commands"""
     pass
 
+@domains.group()
+def register():
+    """Domain registration commands"""
+    pass
+
+@domains.group()
+def transfer():
+    """Domain transfer commands"""
+    pass
+
 def load_domains_from_file(file_path: str) -> List[str]:
     """Load domain names from a file, one domain per line."""
     try:
@@ -168,6 +178,62 @@ def print_suggestions(suggestions: List[Dict]) -> None:
 
     console.print(table)
 
+def save_to_watch_list(domain: str, target_price: float) -> None:
+    """Save a domain to the watch list for price monitoring."""
+    watch_list_file = Path.home() / '.porkbun' / 'watchlist.json'
+    watch_list_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    watch_list = {}
+    if watch_list_file.exists():
+        with open(watch_list_file) as f:
+            watch_list = json.load(f)
+    
+    watch_list[domain] = {
+        'target_price': target_price,
+        'added_at': time.time()
+    }
+    
+    with open(watch_list_file, 'w') as f:
+        json.dump(watch_list, f, indent=2)
+
+def compare_tld_prices(base_domain: str, tld_pricing: Dict) -> List[Dict]:
+    """Compare prices across different TLDs for the same domain name."""
+    comparisons = []
+    name = base_domain.split('.')[0]
+    
+    for tld, pricing in tld_pricing.items():
+        if isinstance(pricing, dict) and 'registration' in pricing:
+            domain = f"{name}.{tld}"
+            comparisons.append({
+                'domain': domain,
+                'tld': tld,
+                'price': pricing['registration'],
+                'renewal': pricing.get('renewal', 'N/A')
+            })
+    
+    return sorted(comparisons, key=lambda x: float(x['price']) if isinstance(x['price'], (int, float, str)) else float('inf'))
+
+def print_price_comparison(comparisons: List[Dict]) -> None:
+    """Print price comparison table."""
+    if not comparisons:
+        return
+
+    table = Table(title="TLD Price Comparison")
+    table.add_column("Domain", style="cyan")
+    table.add_column("TLD", style="blue")
+    table.add_column("Registration", justify="right")
+    table.add_column("Renewal", justify="right")
+
+    for comp in comparisons:
+        table.add_row(
+            comp['domain'],
+            comp['tld'],
+            f"${comp['price']}",
+            f"${comp['renewal']}" if comp['renewal'] != 'N/A' else 'N/A'
+        )
+
+    console.print(table)
+
 # List all domains
 @domains.command()
 def list_all():
@@ -182,19 +248,22 @@ def list_all():
 @click.option('--delay', type=float, default=10.0, help='Delay between requests in seconds (default: 10.0)')
 @click.option('--no-progress', is_flag=True, help='Disable progress bar')
 @click.option('--suggest', is_flag=True, help='Suggest alternative domains')
+@click.option('--compare-tlds', is_flag=True, help='Compare prices across TLDs')
 @click.option('--export', type=click.Choice(['json', 'csv']), help='Export results to file')
 @click.option('--output', type=click.Path(), help='Output file for export')
+@click.option('--watch', type=float, help='Add to watch list with target price')
 def check(domains: Optional[tuple], file: Optional[str], delay: float, no_progress: bool,
-         suggest: bool, export: Optional[str], output: Optional[str]):
-    """Check domain availability."""
+         suggest: bool, compare_tlds: bool, export: Optional[str], output: Optional[str],
+         watch: Optional[float]):
+    """Check domain availability and compare prices."""
     # Get domains from either command line arguments or file
     domain_list = list(domains) if domains else load_domains_from_file(file)
     if not domain_list:
         console.print("[error]Error: No domains specified[/]")
         raise click.Abort()
 
-    # Get TLD pricing if needed for suggestions
-    tld_pricing = get_tld_pricing() if suggest else {}
+    # Get TLD pricing if needed for suggestions or comparison
+    tld_pricing = get_tld_pricing() if (suggest or compare_tlds) else {}
 
     results = []
     all_suggestions = []
@@ -225,12 +294,23 @@ def check(domains: Optional[tuple], file: Optional[str], delay: float, no_progre
                 results.append(result)
                 print_check_result(result)
 
+                # Add to watch list if requested and available
+                if watch is not None and result['success'] and result['available']:
+                    save_to_watch_list(domain, watch)
+                    console.print(f"[info]Added {domain} to watch list with target price ${watch}[/]")
+
                 # Get suggestions for unavailable domains
                 if suggest and result['success'] and not result['available']:
                     suggestions = suggest_domains(domain, tld_pricing)
                     if suggestions:
                         all_suggestions.extend(suggestions)
                         print_suggestions(suggestions)
+
+                # Compare TLD prices
+                if compare_tlds and result['success']:
+                    comparisons = compare_tld_prices(domain, tld_pricing)
+                    if comparisons:
+                        print_price_comparison(comparisons)
 
             except Exception as e:
                 console.print(f"[error]Error checking {domain}: {str(e)}[/]")
@@ -248,17 +328,13 @@ def check(domains: Optional[tuple], file: Optional[str], delay: float, no_progre
             
             progress.advance(task)
 
-    # Print summary table
-    console.print("\n")
-    print_check_summary(results)
+    # Print final summary
+    print_check_summary(results, tld_pricing)
 
     # Export results if requested
     if export and output:
-        try:
-            export_results(results, export, output)
-            console.print(f"\n[success]Results exported to {output}[/]")
-        except Exception as e:
-            console.print(f"\n[error]Error exporting results: {e}[/]")
+        export_results(results, export, output)
+        console.print(f"\n[success]Results exported to {output}[/]")
 
 # Create a new domain
 @domains.command()
@@ -427,94 +503,227 @@ def edit_record(domain: str, record_id: str, type: Optional[str], name: Optional
 @domains.command()
 @click.argument('domains', nargs=-1)
 @click.option('--file', '-f', type=click.Path(exists=True), help='File containing domains')
-@click.option('--years', type=int, default=1, help='Number of years to renew for')
+@click.option('--years', type=int, default=1, help='Number of years to register for')
+@click.option('--nameservers', multiple=True, help='Custom nameservers')
+@click.option('--whois-privacy', is_flag=True, help='Enable WHOIS privacy')
 @click.option('--force', is_flag=True, help='Skip confirmation')
-def renew(domains: tuple, file: Optional[str], years: int, force: bool):
-    """Renew multiple domains"""
-    domain_list = list(domains)
-    if file:
-        domain_list.extend(load_domains_from_file(file))
-        
+def bulk(domains: tuple, file: Optional[str], years: int, nameservers: tuple,
+         whois_privacy: bool, force: bool):
+    """Register multiple domains."""
+    domain_list = list(domains) if domains else load_domains_from_file(file)
     if not domain_list:
-        console.print("[error]No domains specified[/]")
-        return
-        
-    # Get renewal prices
-    total_cost = 0
-    renewals = []
-    
+        console.print("[error]Error: No domains specified[/]")
+        raise click.Abort()
+
+    # Validate and check availability first
+    available_domains = []
+    total_cost = 0.0
+
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
+        TimeElapsedColumn(),
         console=console
     ) as progress:
-        task = progress.add_task("Checking renewal prices...", total=len(domain_list))
+        task = progress.add_task("Checking domains...", total=len(domain_list))
         
         for domain in domain_list:
+            progress.update(task, description=f"Checking {domain}")
             try:
-                result = make_request(f"domain/getRenewalPrice/{domain}", {})
-                if result.get('status') == 'SUCCESS':
-                    price = float(result.get('renewalPrice', 0))
-                    total_cost += price * years
-                    renewals.append({
-                        'domain': domain,
-                        'price': price,
-                        'years': years
-                    })
+                data = make_request(f"domain/checkDomain/{domain}", {})
+                if data.get('status') == 'SUCCESS':
+                    if data.get('response', {}).get('avail') == 'yes':
+                        price = float(data.get('response', {}).get('price', 0))
+                        available_domains.append((domain, price))
+                        total_cost += price * years
+                    else:
+                        console.print(f"[warning]{domain} is not available[/]")
                 else:
-                    console.print(f"[error]Error getting price for {domain}: {result.get('message')}[/]")
+                    console.print(f"[error]Error checking {domain}: {data.get('message')}[/]")
             except Exception as e:
                 console.print(f"[error]Error checking {domain}: {str(e)}[/]")
             progress.advance(task)
-    
-    if not renewals:
-        console.print("[error]No valid domains to renew[/]")
+            time.sleep(10)  # Rate limit compliance
+
+    if not available_domains:
+        console.print("[error]No domains available for registration[/]")
         return
-        
-    # Show renewal summary
-    table = Table(title="Renewal Summary")
+
+    # Show summary and confirm
+    table = Table(title="Domains to Register")
     table.add_column("Domain", style="cyan")
-    table.add_column("Years", justify="right")
     table.add_column("Price/Year", justify="right")
-    table.add_column("Total", justify="right", style="bold")
-    
-    for renewal in renewals:
+    table.add_column("Total", justify="right")
+
+    for domain, price in available_domains:
         table.add_row(
-            renewal['domain'],
-            str(renewal['years']),
-            f"${renewal['price']:.2f}",
-            f"${renewal['price'] * renewal['years']:.2f}"
+            domain,
+            f"${price:.2f}",
+            f"${price * years:.2f}"
         )
-    
+
     console.print(table)
-    console.print(f"\nTotal cost: [bold green]${total_cost:.2f}[/]")
+    console.print(f"\nTotal cost for {years} year(s): [green]${total_cost:.2f}[/]")
     
-    if not force and not click.confirm("Do you want to proceed with the renewal?"):
+    if nameservers:
+        console.print("\nCustom nameservers:")
+        for ns in nameservers:
+            console.print(f"  • {ns}")
+    
+    if whois_privacy:
+        console.print("\n[info]WHOIS privacy will be enabled[/]")
+
+    if not force and not click.confirm("\nDo you want to proceed with registration?"):
         return
-        
-    # Process renewals
+
+    # Register domains
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
+        TimeElapsedColumn(),
         console=console
     ) as progress:
-        task = progress.add_task("Processing renewals...", total=len(renewals))
+        task = progress.add_task("Registering domains...", total=len(available_domains))
         
-        for renewal in renewals:
+        for domain, _ in available_domains:
+            progress.update(task, description=f"Registering {domain}")
             try:
-                result = make_request("domain/renew", {
-                    "domain": renewal['domain'],
-                    "years": renewal['years']
-                })
+                data = {
+                    "years": years,
+                    "whoisPrivacy": whois_privacy
+                }
+                if nameservers:
+                    data["ns"] = list(nameservers)
+                
+                result = make_request(f"domain/register/{domain}", data)
                 if result.get('status') == 'SUCCESS':
-                    console.print(f"[success]Successfully renewed {renewal['domain']} for {renewal['years']} years[/]")
+                    console.print(f"[success]Successfully registered {domain}[/]")
                 else:
-                    console.print(f"[error]Error renewing {renewal['domain']}: {result.get('message')}[/]")
+                    console.print(f"[error]Failed to register {domain}: {result.get('message')}[/]")
             except Exception as e:
-                console.print(f"[error]Error renewing {renewal['domain']}: {str(e)}[/]")
+                console.print(f"[error]Error registering {domain}: {str(e)}[/]")
             progress.advance(task)
+            time.sleep(10)  # Rate limit compliance
+
+@transfer.command()
+@click.argument('domains', nargs=-1)
+@click.option('--file', '-f', type=click.Path(exists=True), help='File containing domains')
+@click.option('--auth-code', required=True, help='Authorization code for transfer')
+@click.option('--whois-privacy', is_flag=True, help='Enable WHOIS privacy after transfer')
+@click.option('--force', is_flag=True, help='Skip confirmation')
+def bulk(domains: tuple, file: Optional[str], auth_code: str,
+         whois_privacy: bool, force: bool):
+    """Transfer multiple domains to Porkbun."""
+    domain_list = list(domains) if domains else load_domains_from_file(file)
+    if not domain_list:
+        console.print("[error]Error: No domains specified[/]")
+        raise click.Abort()
+
+    # Check transfer eligibility
+    eligible_domains = []
+    total_cost = 0.0
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TimeElapsedColumn(),
+        console=console
+    ) as progress:
+        task = progress.add_task("Checking transfer eligibility...", total=len(domain_list))
+        
+        for domain in domain_list:
+            progress.update(task, description=f"Checking {domain}")
+            try:
+                data = make_request(f"domain/transferCheck/{domain}", {})
+                if data.get('status') == 'SUCCESS':
+                    price = float(data.get('response', {}).get('price', 0))
+                    eligible_domains.append((domain, price))
+                    total_cost += price
+                else:
+                    console.print(f"[error]{domain} is not eligible for transfer: {data.get('message')}[/]")
+            except Exception as e:
+                console.print(f"[error]Error checking {domain}: {str(e)}[/]")
+            progress.advance(task)
+            time.sleep(10)  # Rate limit compliance
+
+    if not eligible_domains:
+        console.print("[error]No domains eligible for transfer[/]")
+        return
+
+    # Show summary and confirm
+    table = Table(title="Domains to Transfer")
+    table.add_column("Domain", style="cyan")
+    table.add_column("Transfer Cost", justify="right")
+
+    for domain, price in eligible_domains:
+        table.add_row(domain, f"${price:.2f}")
+
+    console.print(table)
+    console.print(f"\nTotal transfer cost: [green]${total_cost:.2f}[/]")
+    
+    if whois_privacy:
+        console.print("\n[info]WHOIS privacy will be enabled after transfer[/]")
+
+    if not force and not click.confirm("\nDo you want to proceed with transfer?"):
+        return
+
+    # Initiate transfers
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TimeElapsedColumn(),
+        console=console
+    ) as progress:
+        task = progress.add_task("Initiating transfers...", total=len(eligible_domains))
+        
+        for domain, _ in eligible_domains:
+            progress.update(task, description=f"Transferring {domain}")
+            try:
+                data = {
+                    "auth": auth_code,
+                    "whoisPrivacy": whois_privacy
+                }
+                
+                result = make_request(f"domain/transfer/{domain}", data)
+                if result.get('status') == 'SUCCESS':
+                    console.print(f"[success]Successfully initiated transfer for {domain}[/]")
+                else:
+                    console.print(f"[error]Failed to initiate transfer for {domain}: {result.get('message')}[/]")
+            except Exception as e:
+                console.print(f"[error]Error transferring {domain}: {str(e)}[/]")
+            progress.advance(task)
+            time.sleep(10)  # Rate limit compliance
+
+@transfer.command()
+def status():
+    """Check status of pending transfers."""
+    try:
+        result = make_request("domain/transferList", {})
+        if not result.get('transfers'):
+            console.print("[info]No pending transfers[/]")
+            return
+
+        table = Table(title="Pending Transfers")
+        table.add_column("Domain", style="cyan")
+        table.add_column("Status", style="bold")
+        table.add_column("Started", style="dim")
+        table.add_column("Updated", style="dim")
+
+        for transfer in result['transfers']:
+            table.add_row(
+                transfer['domain'],
+                transfer['status'],
+                transfer.get('startDate', 'N/A'),
+                transfer.get('updateDate', 'N/A')
+            )
+
+        console.print(table)
+    except Exception as e:
+        console.print(f"[error]Error checking transfer status: {str(e)}[/]")
 
 @ssl.command()
 @click.argument('domain')
@@ -658,3 +867,52 @@ def privacy(domain: str, enable: bool):
             console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
     except Exception as e:
         console.print(f"[error]Error: {str(e)}[/]")
+
+@domains.command()
+def watch_list():
+    """Show domains in the watch list."""
+    watch_list_file = Path.home() / '.porkbun' / 'watchlist.json'
+    if not watch_list_file.exists():
+        console.print("[warning]Watch list is empty[/]")
+        return
+
+    with open(watch_list_file) as f:
+        watch_list = json.load(f)
+
+    if not watch_list:
+        console.print("[warning]Watch list is empty[/]")
+        return
+
+    table = Table(title="Domain Watch List")
+    table.add_column("Domain", style="cyan")
+    table.add_column("Target Price", justify="right")
+    table.add_column("Current Price", justify="right")
+    table.add_column("Status", style="bold")
+
+    for domain, info in watch_list.items():
+        try:
+            data = make_request(f"domain/checkDomain/{domain}", {})
+            current_price = data.get('response', {}).get('price', 'N/A')
+            available = data.get('response', {}).get('avail') == 'yes'
+            
+            status = "[green]Available[/]" if available else "[red]Taken[/]"
+            if available and float(current_price) <= info['target_price']:
+                status = "[green bold]Target Price Met![/]"
+            
+            table.add_row(
+                domain,
+                f"${info['target_price']}",
+                f"${current_price}" if current_price != 'N/A' else 'N/A',
+                status
+            )
+            time.sleep(10)  # Rate limit compliance
+            
+        except Exception as e:
+            table.add_row(
+                domain,
+                f"${info['target_price']}",
+                'Error',
+                f"[red]{str(e)}[/]"
+            )
+
+    console.print(table)
