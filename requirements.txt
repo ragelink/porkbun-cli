@@ -1,3 +1,7 @@
-virtualenv
-requests
-click
+virtualenv>=20.25.0
+requests>=2.32.3
+click>=8.1.7
+python-dotenv>=1.0.1
+rich>=13.7.0
+tqdm>=4.66.2
+colorama>=0.4.6
