@@ -1,0 +1,1 @@
+[{"source":"blog","destination":"https://medium.com/@yourusername","type":"301"},{"source":"shop","destination":"https://shop.example.com","type":"302"},{"source":"app","destination":"https://app.example.com","type":"iframe","title":"Web Application"}]

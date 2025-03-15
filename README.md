@@ -12,6 +12,7 @@ A powerful command-line interface tool for managing domains, DNS records, SSL ce
 - **Domain Portfolio**: Organize domains with groups and tags
 - **Domain Monitoring**: Track expiring domains and price watch
 - **Email Forwarding**: Set up and manage email forwards
+- **URL Forwarding**: Manage URL forwards for your domains
 
 ## Requirements
 
@@ -193,6 +194,70 @@ View all domain tags:
 ```bash
 python -m porkbun.cli account portfolio tags
 ```
+
+## URL Forwarding
+
+The CLI supports URL forwarding management for your domains:
+
+```bash
+# List all URL forwards for a domain
+python -m porkbun.cli url list-forwards example.com
+
+# Add a URL forward
+python -m porkbun.cli url add-forward example.com blog https://medium.com/@yourusername --type 301
+
+# Delete a URL forward
+python -m porkbun.cli url delete-forward example.com blog
+
+# Add multiple URL forwards from a JSON file
+python -m porkbun.cli url batch-add example.com url_forwards.json
+```
+
+URL forwarding allows you to redirect requests from paths on your domain to other URLs. This is useful for:
+
+- Setting up redirects for legacy pages
+- Creating shortcuts to external content
+- Implementing a simple URL shortener
+- Embedding external content in iframes
+
+## DNS Batch Operations
+
+The CLI now supports batch operations for DNS records, allowing you to create, update, or delete multiple records in a single command.
+
+### Batch Update DNS Records
+
+You can create or update multiple DNS records at once using a JSON file:
+
+```bash
+porkbun dns batch-update example.com records.json
+```
+
+The JSON file should contain an array of DNS record objects with the following fields:
+- `type`: Record type (A, AAAA, MX, CNAME, TXT, NS, etc.)
+- `name`: Record name
+- `content`: Record content
+- `ttl`: Time to live (optional, defaults to 600)
+- `id`: Record ID (only needed for updating existing records)
+
+Example JSON file:
+```json
+[
+    {"type": "A", "name": "test", "content": "192.0.2.1", "ttl": 600},
+    {"type": "CNAME", "name": "www", "content": "example.com", "ttl": 600}
+]
+```
+
+**Note on domain names**: When specifying record names, be aware that the Porkbun API may append the domain to the record name. For example, a record name of `www` might be displayed as `www.example.com.example.com` in the API response. The CLI attempts to handle this properly, but you may need to manually correct record names in some cases.
+
+### Batch Delete DNS Records
+
+You can delete multiple DNS records at once by specifying their IDs:
+
+```bash
+porkbun dns batch-delete example.com id1 id2 id3
+```
+
+This will delete all the specified records and provide a summary of the operation.
 
 ## Docker
 

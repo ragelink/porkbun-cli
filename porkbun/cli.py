@@ -10,6 +10,7 @@ from porkbun.commands.account import account
 from porkbun.commands.config import config
 from porkbun.commands.monitor import monitor
 from porkbun.commands.automation import automation
+from porkbun.commands.url import url
 from porkbun.utils.logging import setup_logging, logger
 from porkbun.utils.config import ConfigManager
 
@@ -42,6 +43,7 @@ cli.add_command(account)
 cli.add_command(config)
 cli.add_command(monitor)
 cli.add_command(automation)
+cli.add_command(url)
 
 if __name__ == '__main__':
     cli()

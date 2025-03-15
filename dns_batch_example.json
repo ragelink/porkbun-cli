@@ -1,0 +1,20 @@
+[
+    {
+        "type": "A",
+        "name": "test2",
+        "content": "192.0.2.2",
+        "ttl": 600
+    },
+    {
+        "type": "TXT",
+        "name": "test-txt2.ragelink.com",
+        "content": "This is another test TXT record",
+        "ttl": 600
+    },
+    {
+        "type": "CNAME",
+        "name": "www",
+        "content": "ragelink.com",
+        "ttl": 600
+    }
+] 

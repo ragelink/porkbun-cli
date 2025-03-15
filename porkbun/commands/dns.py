@@ -28,23 +28,44 @@ def retrieve(domain):
             records = result.get('records', [])
             
             if not records:
-                console.print("[info]No DNS records found[/]")
+                console.print("[bold yellow]No DNS records found for[/] [bold green]{}[/]".format(domain))
                 return 0
                 
-            table = Table(title=f"DNS Records for {domain}")
-            table.add_column("Type", style="cyan")
+            # Sort records by type and then by name for better organization
+            records = sorted(records, key=lambda r: (r.get('type', ''), r.get('name', '')))
+                
+            table = Table(title=f"DNS Records for [bold]{domain}[/]", title_style="bold blue", header_style="bold")
+            table.add_column("Type", style="cyan", justify="center")
             table.add_column("Name", style="green")
-            table.add_column("Content", style="yellow")
-            table.add_column("TTL", justify="right")
+            table.add_column("Content", style="yellow", no_wrap=False, overflow="fold")
+            table.add_column("TTL", justify="right", style="magenta")
             table.add_column("ID", style="dim")
             
+            # Define priority record types for highlighting
+            priority_types = {"A", "AAAA", "MX", "CNAME", "TXT", "NS"}
+            
             for record in records:
+                record_type = record.get('type', '')
+                row_style = "bold" if record_type in priority_types else ""
+                
+                # Format TTL with human-readable time
+                ttl = int(record.get('ttl', 0))
+                if ttl >= 86400:
+                    ttl_display = f"{ttl//86400}d {(ttl%86400)//3600}h"
+                elif ttl >= 3600:
+                    ttl_display = f"{ttl//3600}h {(ttl%3600)//60}m"
+                elif ttl >= 60:
+                    ttl_display = f"{ttl//60}m {ttl%60}s"
+                else:
+                    ttl_display = f"{ttl}s"
+                
                 table.add_row(
-                    record.get('type', ''),
+                    record_type,
                     record.get('name', ''),
                     record.get('content', ''),
-                    str(record.get('ttl', '')),
-                    record.get('id', '')
+                    ttl_display,
+                    record.get('id', ''),
+                    style=row_style
                 )
             
             console.print(table)
@@ -114,23 +135,44 @@ def retrieve_records(domain):
             records = result.get('records', [])
             
             if not records:
-                console.print("[info]No DNS records found[/]")
+                console.print("[bold yellow]No DNS records found for[/] [bold green]{}[/]".format(domain))
                 return 0
                 
-            table = Table(title=f"DNS Records for {domain}")
-            table.add_column("Type", style="cyan")
+            # Sort records by type and then by name for better organization
+            records = sorted(records, key=lambda r: (r.get('type', ''), r.get('name', '')))
+                
+            table = Table(title=f"DNS Records for [bold]{domain}[/]", title_style="bold blue", header_style="bold")
+            table.add_column("Type", style="cyan", justify="center")
             table.add_column("Name", style="green")
-            table.add_column("Content", style="yellow")
-            table.add_column("TTL", justify="right")
+            table.add_column("Content", style="yellow", no_wrap=False, overflow="fold")
+            table.add_column("TTL", justify="right", style="magenta")
             table.add_column("ID", style="dim")
             
+            # Define priority record types for highlighting
+            priority_types = {"A", "AAAA", "MX", "CNAME", "TXT", "NS"}
+            
             for record in records:
+                record_type = record.get('type', '')
+                row_style = "bold" if record_type in priority_types else ""
+                
+                # Format TTL with human-readable time
+                ttl = int(record.get('ttl', 0))
+                if ttl >= 86400:
+                    ttl_display = f"{ttl//86400}d {(ttl%86400)//3600}h"
+                elif ttl >= 3600:
+                    ttl_display = f"{ttl//3600}h {(ttl%3600)//60}m"
+                elif ttl >= 60:
+                    ttl_display = f"{ttl//60}m {ttl%60}s"
+                else:
+                    ttl_display = f"{ttl}s"
+                
                 table.add_row(
-                    record.get('type', ''),
+                    record_type,
                     record.get('name', ''),
                     record.get('content', ''),
-                    str(record.get('ttl', '')),
-                    record.get('id', '')
+                    ttl_display,
+                    record.get('id', ''),
+                    style=row_style
                 )
             
             console.print(table)
@@ -254,12 +296,199 @@ def delete_record(domain, record_id):
         raise click.BadParameter("Invalid domain format")
         
     try:
-        data = {"domain": domain, "id": record_id}
-        result = make_request("dns/delete", data)
-        click.echo(result)
+        result = asyncio.run(make_request(f"dns/delete/{domain}/{record_id}", {}))
+        if result.get('status') == 'SUCCESS':
+            console.print(f"[green]Successfully deleted record ID: {record_id}[/]")
+        else:
+            console.print(f"[error]Failed to delete record: {result.get('message', 'Unknown error')}[/]")
+    except Exception as e:
+        console.print(f"[error]Error: {str(e)}[/]")
+        ctx = click.get_current_context()
+        ctx.exit(1)
+
+# Batch delete DNS records
+@dns.command()
+@click.argument("domain")
+@click.argument("record_ids", nargs=-1)
+def batch_delete(domain, record_ids):
+    """Delete multiple DNS records at once"""
+    if not validate_domain(domain):
+        raise click.BadParameter("Invalid domain format")
+        
+    if not record_ids:
+        console.print("[error]No record IDs provided. Please specify at least one record ID to delete.[/]")
+        ctx = click.get_current_context()
+        ctx.exit(1)
+        
+    success_count = 0
+    error_count = 0
+    
+    with console.status(f"[bold green]Deleting {len(record_ids)} DNS records from {domain}...[/]") as status:
+        for i, record_id in enumerate(record_ids):
+            status.update(f"[bold green]Deleting record {i+1}/{len(record_ids)}: ID {record_id}[/]")
+            
+            try:
+                result = asyncio.run(make_request(f"dns/delete/{domain}/{record_id}", {}))
+                if result.get('status') == 'SUCCESS':
+                    console.print(f"[green]Successfully deleted record ID: {record_id}[/]")
+                    success_count += 1
+                else:
+                    console.print(f"[error]Failed to delete record {record_id}: {result.get('message', 'Unknown error')}[/]")
+                    error_count += 1
+            except Exception as e:
+                console.print(f"[error]Error deleting record {record_id}: {str(e)}[/]")
+                error_count += 1
+    
+    # Summary
+    if success_count > 0 and error_count == 0:
+        console.print(f"[bold green]Successfully deleted all {success_count} DNS records from {domain}[/]")
+    elif success_count > 0:
+        console.print(f"[bold yellow]Deleted {success_count} records successfully with {error_count} errors from {domain}[/]")
+    else:
+        console.print(f"[bold red]Failed to delete any DNS records from {domain}[/]")
+
+# Batch update DNS records for a domain
+@dns.command()
+@click.argument("domain")
+@click.argument("batch_file", type=click.Path(exists=True, readable=True))
+def batch_update(domain, batch_file):
+    """Batch update DNS records for a domain using a JSON file.
+    
+    The JSON file should contain an array of DNS record objects with the following fields:
+    - type: Record type (A, AAAA, MX, CNAME, TXT, NS, etc.)
+    - name: Record name
+    - content: Record content
+    - ttl: Time to live (optional, defaults to 600)
+    - id: Record ID (only needed for updating existing records)
+    
+    Example JSON file:
+    [
+        {"type": "A", "name": "example.com", "content": "192.0.2.1", "ttl": 600},
+        {"type": "CNAME", "name": "www.example.com", "content": "example.com", "ttl": 600}
+    ]
+    """
+    if not validate_domain(domain):
+        raise click.BadParameter("Invalid domain format")
+        
+    try:
+        # Read batch file
+        with open(batch_file, 'r') as f:
+            records = json.load(f)
+            
+        if not isinstance(records, list):
+            console.print("[error]Batch file must contain a JSON array of DNS record objects[/]")
+            ctx = click.get_current_context()
+            ctx.exit(1)
+            
+        # Get existing records to compare and update
+        result = asyncio.run(make_request(f"dns/retrieve/{domain}", {}))
+        if result.get('status') != 'SUCCESS':
+            console.print(f"[error]Error retrieving existing DNS records: {result.get('message', 'Unknown error')}[/]")
+            ctx = click.get_current_context()
+            ctx.exit(1)
+            
+        existing_records = {r.get('id'): r for r in result.get('records', [])}
+        
+        # Process each record
+        success_count = 0
+        error_count = 0
+        
+        with console.status(f"[bold green]Processing {len(records)} DNS records for {domain}...[/]") as status:
+            for i, record in enumerate(records):
+                record_id = record.get('id')
+                record_type = record.get('type')
+                record_name = record.get('name')
+                record_content = record.get('content')
+                record_ttl = record.get('ttl', 600)
+                
+                # Validate record
+                if not record_type or not record_name or not record_content:
+                    console.print(f"[error]Record {i+1}: Missing required fields (type, name, content)[/]")
+                    error_count += 1
+                    continue
+                    
+                try:
+                    validate_record_type(record_type)
+                    validate_ttl(record_ttl)
+                except click.BadParameter as e:
+                    console.print(f"[error]Record {i+1}: {str(e)}[/]")
+                    error_count += 1
+                    continue
+                
+                status.update(f"[bold green]Processing record {i+1}/{len(records)}: {record_type} {record_name}[/]")
+                
+                # Normalize record name to avoid domain duplication
+                if record_name == "@" or record_name == "":
+                    # Root domain
+                    record_name = domain
+                elif record_name.endswith(f".{domain}"):
+                    # Strip duplicate domain suffix if present
+                    if record_name == f"{domain}.{domain}":
+                        record_name = domain
+                    else:
+                        # Already has domain suffix
+                        pass
+                elif "." not in record_name:
+                    # Single label, add domain
+                    record_name = f"{record_name}.{domain}"
+                else:
+                    # Multi-label that doesn't end with the domain
+                    if not record_name.endswith("."):
+                        # Not a fully qualified domain name, treat as relative to the domain
+                        if not domain in record_name:
+                            record_name = f"{record_name}.{domain}"
+                
+                console.print(f"[dim]Using normalized name: {record_name}[/]")
+                
+                # Create or update record
+                if record_id and record_id in existing_records:
+                    # Update existing record
+                    endpoint = f"dns/edit/{domain}/{record_id}"
+                    data = {
+                        "type": record_type,
+                        "name": record_name,
+                        "content": record_content,
+                        "ttl": record_ttl
+                    }
+                    update_result = asyncio.run(make_request(endpoint, data))
+                    if update_result.get('status') == 'SUCCESS':
+                        console.print(f"[green]Updated record: {record_type} {record_name}[/]")
+                        success_count += 1
+                    else:
+                        console.print(f"[error]Failed to update record {record_name}: {update_result.get('message', 'Unknown error')}[/]")
+                        error_count += 1
+                else:
+                    # Create new record
+                    endpoint = f"dns/create/{domain}"
+                    data = {
+                        "type": record_type,
+                        "name": record_name,
+                        "content": record_content,
+                        "ttl": record_ttl
+                    }
+                    create_result = asyncio.run(make_request(endpoint, data))
+                    if create_result.get('status') == 'SUCCESS':
+                        console.print(f"[green]Created record: {record_type} {record_name}[/]")
+                        success_count += 1
+                    else:
+                        console.print(f"[error]Failed to create record {record_name}: {create_result.get('message', 'Unknown error')}[/]")
+                        error_count += 1
+        
+        # Summary
+        if success_count > 0 and error_count == 0:
+            console.print(f"[bold green]Successfully processed all {success_count} DNS records for {domain}[/]")
+        elif success_count > 0:
+            console.print(f"[bold yellow]Processed {success_count} records successfully with {error_count} errors for {domain}[/]")
+        else:
+            console.print(f"[bold red]Failed to process any DNS records for {domain}[/]")
+            
         return 0
-    except PorkbunAPIError as e:
-        click.echo(f"Error: {str(e)}")
+    except json.JSONDecodeError:
+        console.print(f"[error]Invalid JSON in batch file {batch_file}[/]")
+        ctx = click.get_current_context()
+        ctx.exit(1)
+    except Exception as e:
+        console.print(f"[error]Error: {str(e)}[/]")
         ctx = click.get_current_context()
         ctx.exit(1)
 

@@ -250,6 +250,54 @@ Delete a DNS record.
 python -m porkbun.cli dns delete-record DOMAIN RECORD_ID
 ```
 
+### dns batch-update
+
+Create or update multiple DNS records at once using a JSON file.
+
+```bash
+python -m porkbun.cli dns batch-update DOMAIN BATCH_FILE
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `BATCH_FILE`: Path to JSON file containing DNS records
+
+The JSON file should contain an array of DNS record objects with the following fields:
+- `type`: Record type (A, AAAA, MX, CNAME, TXT, etc.)
+- `name`: Record name
+- `content`: Record content
+- `ttl`: Time to live (optional, defaults to 600)
+- `id`: Record ID (only needed for updating existing records)
+
+Example JSON file:
+```json
+[
+    {"type": "A", "name": "test", "content": "192.0.2.1", "ttl": 600},
+    {"type": "CNAME", "name": "www", "content": "example.com", "ttl": 600}
+]
+```
+
+**Note on domain names**: When specifying record names, be aware that the Porkbun API may append the domain to the record name. For example, a record name of `www` might be displayed as `www.example.com.example.com` in the API response.
+
+### dns batch-delete
+
+Delete multiple DNS records at once.
+
+```bash
+python -m porkbun.cli dns batch-delete DOMAIN RECORD_IDS...
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `RECORD_IDS`: One or more record IDs to delete
+
+**Example:**
+```bash
+python -m porkbun.cli dns batch-delete example.com 12345 67890 54321
+```
+
+This will delete all the specified records and provide a summary of the operation.
+
 ### dns dnssec status
 
 Check DNSSEC status.
@@ -388,3 +436,71 @@ python -m porkbun.cli monitor dns DOMAIN [--record-type TYPE] [--expected-value 
 **Options:**
 - `--record-type TYPE`: DNS record type to monitor
 - `--expected-value VALUE`: Expected value for the record 
+
+## URL Forwarding Commands
+
+### url list-forwards
+
+List URL forwards for a domain.
+
+```bash
+python -m porkbun.cli url list-forwards DOMAIN
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+
+### url add-forward
+
+Add URL forward for a domain.
+
+```bash
+python -m porkbun.cli url add-forward DOMAIN SOURCE DESTINATION [--type TYPE] [--title TITLE]
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `SOURCE`: Source path (e.g., 'blog' or '/' for root)
+- `DESTINATION`: Destination URL (e.g., 'https://example.com/blog')
+
+**Options:**
+- `--type TYPE`: Redirect type: 301 (permanent), 302 (temporary), or iframe. Default is 301.
+- `--title TITLE`: Title for iframe redirects
+
+### url delete-forward
+
+Delete URL forward for a domain.
+
+```bash
+python -m porkbun.cli url delete-forward DOMAIN SOURCE
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `SOURCE`: Source path to delete (e.g., 'blog' or '/' for root)
+
+### url batch-add
+
+Add multiple URL forwards for a domain using a JSON file.
+
+```bash
+python -m porkbun.cli url batch-add DOMAIN BATCH_FILE
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `BATCH_FILE`: Path to JSON file containing URL forward definitions
+
+The JSON file should contain an array of forwarding objects with the following fields:
+- `source`: Source path (e.g., 'blog' or '/' for root)
+- `destination`: Destination URL (e.g., 'https://example.com/blog')
+- `type`: Redirect type ('301', '302', or 'iframe') - optional, defaults to '301'
+- `title`: Title for iframe redirects - optional
+
+Example JSON file:
+```json
+[
+    {"source": "blog", "destination": "https://example.com/blog", "type": "301"},
+    {"source": "shop", "destination": "https://shop.example.com", "type": "302"}
+]
+``` 
