@@ -503,4 +503,91 @@ Example JSON file:
     {"source": "blog", "destination": "https://example.com/blog", "type": "301"},
     {"source": "shop", "destination": "https://shop.example.com", "type": "302"}
 ]
-``` 
+```
+
+## Email Forwarding Commands
+
+### email list-forwards
+
+List email forwards for a domain.
+
+```bash
+python -m porkbun.cli email list-forwards DOMAIN
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+
+### email create-forward
+
+Create an email forward.
+
+```bash
+python -m porkbun.cli email create-forward DOMAIN EMAIL_PREFIX FORWARD_TO
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `EMAIL_PREFIX`: Local part of the email (before @)
+- `FORWARD_TO`: Email address to forward to
+
+### email update-forward
+
+Update an email forward's destination.
+
+```bash
+python -m porkbun.cli email update-forward DOMAIN EMAIL_ID FORWARD_TO
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `EMAIL_ID`: ID of the email forward to update
+- `FORWARD_TO`: New email address to forward to
+
+### email delete-forward
+
+Delete an email forward.
+
+```bash
+python -m porkbun.cli email delete-forward DOMAIN EMAIL_ID
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `EMAIL_ID`: ID of the email forward to delete
+
+### email batch-create
+
+Create multiple email forwards for a domain using a JSON file.
+
+```bash
+python -m porkbun.cli email batch-create DOMAIN BATCH_FILE
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `BATCH_FILE`: Path to JSON file containing email forward definitions
+
+The JSON file should contain an array of forwarding objects with the following fields:
+- `email_prefix`: Local part of the email (before @)
+- `forward_to`: Email address to forward to
+
+Example JSON file:
+```json
+[
+    {"email_prefix": "info", "forward_to": "contact@example.com"},
+    {"email_prefix": "sales", "forward_to": "sales@example.com"}
+]
+```
+
+### email batch-delete
+
+Delete multiple email forwards at once.
+
+```bash
+python -m porkbun.cli email batch-delete DOMAIN EMAIL_ID_1 [EMAIL_ID_2 ...]
+```
+
+**Arguments:**
+- `DOMAIN`: Domain name
+- `EMAIL_ID_1 [EMAIL_ID_2 ...]`: One or more email forward IDs to delete 

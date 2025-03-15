@@ -220,6 +220,52 @@ URL forwarding allows you to redirect requests from paths on your domain to othe
 - Implementing a simple URL shortener
 - Embedding external content in iframes
 
+## Email Forwarding
+
+The CLI supports email forwarding management for your domains:
+
+```bash
+# List all email forwards for a domain
+python -m porkbun.cli email list-forwards example.com
+
+# Create an email forward
+python -m porkbun.cli email create-forward example.com info contact@example.com
+
+# Update an email forward destination
+python -m porkbun.cli email update-forward example.com FORWARD_ID new-email@example.com
+
+# Delete an email forward
+python -m porkbun.cli email delete-forward example.com FORWARD_ID
+
+# Create multiple email forwards from a JSON file
+python -m porkbun.cli email batch-create example.com email_forwards.json
+
+# Delete multiple email forwards at once
+python -m porkbun.cli email batch-delete example.com FORWARD_ID_1 FORWARD_ID_2 FORWARD_ID_3
+```
+
+Email forwarding allows you to receive emails sent to addresses on your domain at another email address. This is useful for:
+
+- Creating role-based emails (info@, sales@, support@)
+- Setting up email aliases without managing a full email server
+- Maintaining professional email addresses that forward to personal inboxes
+- Creating temporary or special-purpose email addresses
+
+The batch operations support JSON files with the following structure:
+
+```json
+[
+  {
+    "email_prefix": "info",
+    "forward_to": "contact@example.com"
+  },
+  {
+    "email_prefix": "sales",
+    "forward_to": "sales@example.com"
+  }
+]
+```
+
 ## DNS Batch Operations
 
 The CLI now supports batch operations for DNS records, allowing you to create, update, or delete multiple records in a single command.

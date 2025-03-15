@@ -63,4 +63,21 @@ def validate_record_type(record_type: str) -> bool:
         bool: True if record type is valid, False otherwise
     """
     valid_types = {'A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA'}
-    return record_type.upper() in valid_types 
+    return record_type.upper() in valid_types
+
+def validate_email(email: str) -> bool:
+    """
+    Validate email address format.
+    
+    Args:
+        email: Email address to validate
+        
+    Returns:
+        bool: True if email is valid, False otherwise
+    """
+    if not email:
+        return False
+        
+    # Email format validation - RFC 5322 compliant pattern
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.match(pattern, email)) 

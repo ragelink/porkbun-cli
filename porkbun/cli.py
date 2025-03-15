@@ -11,6 +11,7 @@ from porkbun.commands.config import config
 from porkbun.commands.monitor import monitor
 from porkbun.commands.automation import automation
 from porkbun.commands.url import url
+from porkbun.commands.email import email
 from porkbun.utils.logging import setup_logging, logger
 from porkbun.utils.config import ConfigManager
 
@@ -44,6 +45,7 @@ cli.add_command(config)
 cli.add_command(monitor)
 cli.add_command(automation)
 cli.add_command(url)
+cli.add_command(email)
 
 if __name__ == '__main__':
     cli()

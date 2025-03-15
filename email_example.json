@@ -1,0 +1,22 @@
+[
+  {
+    "email_prefix": "info",
+    "forward_to": "contact@example.com"
+  },
+  {
+    "email_prefix": "sales",
+    "forward_to": "sales@example.com"
+  },
+  {
+    "email_prefix": "support",
+    "forward_to": "help@example.com"
+  },
+  {
+    "email_prefix": "admin",
+    "forward_to": "administrator@example.com"
+  },
+  {
+    "email_prefix": "no-reply",
+    "forward_to": "notifications@example.com"
+  }
+] 
