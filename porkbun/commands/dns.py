@@ -53,6 +53,17 @@ def retrieve(domain):
         return 0
     except PorkbunAPIError as e:
         console.print(f"[error]Error: {str(e)}[/]")
+        if "domain is not opted in to api access" in str(e).lower():
+            console.print("[info]This error occurs when a domain is not enabled for API access in your Porkbun account.[/]")
+            console.print("[info]To fix this issue:[/]")
+            console.print("[info]1. Log in to your Porkbun dashboard at https://porkbun.com/account/login[/]")
+            console.print("[info]2. Navigate to the domain management page for " + domain + "[/]")
+            console.print("[info]3. Look for the 'API Access' option and enable it[/]")
+            console.print("[info]4. Try this command again after enabling API access[/]")
+        ctx = click.get_current_context()
+        ctx.exit(1)
+    except Exception as e:
+        console.print(f"[error]Error: {str(e)}[/]")
         ctx = click.get_current_context()
         ctx.exit(1)
 
@@ -127,6 +138,17 @@ def retrieve_records(domain):
             console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
         return 0
     except PorkbunAPIError as e:
+        console.print(f"[error]Error: {str(e)}[/]")
+        if "domain is not opted in to api access" in str(e).lower():
+            console.print("[info]This error occurs when a domain is not enabled for API access in your Porkbun account.[/]")
+            console.print("[info]To fix this issue:[/]")
+            console.print("[info]1. Log in to your Porkbun dashboard at https://porkbun.com/account/login[/]")
+            console.print("[info]2. Navigate to the domain management page for " + domain + "[/]")
+            console.print("[info]3. Look for the 'API Access' option and enable it[/]")
+            console.print("[info]4. Try this command again after enabling API access[/]")
+        ctx = click.get_current_context()
+        ctx.exit(1)
+    except Exception as e:
         console.print(f"[error]Error: {str(e)}[/]")
         ctx = click.get_current_context()
         ctx.exit(1)

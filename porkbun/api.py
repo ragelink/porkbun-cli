@@ -178,6 +178,20 @@ class APIClient:
             
         except httpx.HTTPStatusError as e:
             logger.error(f"HTTP error: {e.response.status_code} - {e.response.text}")
+            # Check for specific error message about domain not opted in to API access
+            error_text = e.response.text.lower()
+            if "domain is not opted in to api access" in error_text:
+                # Extract domain from URL path
+                domain = url.split('/')[-1]
+                error_message = (
+                    f"Domain {domain} is not opted in to API access.\n\n"
+                    f"To fix this issue:\n"
+                    f"1. Log in to your Porkbun dashboard at https://porkbun.com/account/login\n"
+                    f"2. Navigate to the domain management page for {domain}\n"
+                    f"3. Look for the 'API Access' option and enable it\n"
+                    f"4. Try this command again after enabling API access"
+                )
+                raise APIError(error_message)
             raise APIError(f"API request failed: {e}")
         except Exception as e:
             logger.error(f"API error: {e}")
