@@ -1,0 +1,116 @@
+site_name: Porkbun CLI
+site_description: Command-line interface for managing Porkbun domains and services
+repo_url: https://github.com/ragelink/porkbun-cli
+repo_name: ragelink/porkbun-cli
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          rendering:
+            show_source: true
+  - git-revision-date-localized:
+      type: datetime
+  - social
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Configuration: getting-started/configuration.md
+  - User Guide:
+    - Domain Management:
+      - Checking Domains: user-guide/domains/checking.md
+      - Registration: user-guide/domains/registration.md
+      - Transfer: user-guide/domains/transfer.md
+      - Renewal: user-guide/domains/renewal.md
+    - DNS Management:
+      - Record Management: user-guide/dns/records.md
+      - DNSSEC: user-guide/dns/dnssec.md
+      - Templates: user-guide/dns/templates.md
+    - SSL Certificates:
+      - Management: user-guide/ssl/management.md
+      - Installation: user-guide/ssl/installation.md
+    - Monitoring:
+      - Domain Monitoring: user-guide/monitoring/domains.md
+      - Health Checks: user-guide/monitoring/health.md
+    - Automation:
+      - Scripts: user-guide/automation/scripts.md
+      - Webhooks: user-guide/automation/webhooks.md
+      - Scheduling: user-guide/automation/scheduling.md
+  - API Reference:
+    - CLI Commands: api/commands.md
+    - Python API: api/python.md
+  - Development:
+    - Contributing: development/contributing.md
+    - Development Setup: development/setup.md
+    - Testing: development/testing.md
+  - FAQ: faq.md
+  - Changelog: changelog.md 

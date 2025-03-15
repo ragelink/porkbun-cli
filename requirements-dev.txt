@@ -4,4 +4,10 @@ pytest-cov>=4.1.0
 black>=24.2.0
 isort>=5.13.2
 mypy>=1.8.0
-ruff>=0.2.2 
+ruff>=0.2.2
+
+# Documentation
+mkdocs-material>=9.5.0
+mkdocstrings[python]>=0.24.0
+mkdocs-git-revision-date-localized-plugin>=1.2.0
+mkdocs-social-plugin>=0.1.0 

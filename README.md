@@ -1,15 +1,22 @@
 # Porkbun CLI
 
-Porkbun CLI is a command-line interface tool for managing domains, DNS records, email forwards, SSL certificates, and account details using the Porkbun API.
+A powerful command-line interface tool for managing domains, DNS records, SSL certificates, and more using the Porkbun API.
 
 ## Features
 
-- **Domain Management**: List, create, delete, and update domains and their name servers.
-- **DNS Management**: Create, retrieve, update, and delete DNS records.
-- **Email Forwarding**: Manage email forwards for domains.
-- **SSL Management**: Retrieve SSL bundles for domains.
-- **Account Management**: Get account details.
-- **WHOIS Privacy**: Enable, disable, and retrieve WHOIS privacy status.
+- **Domain Management**: List, check availability, register, transfer, renew, and manage domains
+- **DNS Management**: Create, retrieve, update, and delete DNS records
+- **DNSSEC Management**: Enable, disable, and check DNSSEC status
+- **SSL Management**: Generate and retrieve SSL certificates
+- **Account Management**: Check balance, view transaction history
+- **Domain Portfolio**: Organize domains with groups and tags
+- **Domain Monitoring**: Track expiring domains and price watch
+- **Email Forwarding**: Set up and manage email forwards
+
+## Requirements
+
+- Python 3.8 or higher
+- Porkbun account with API access enabled
 
 ## Installation
 
@@ -21,81 +28,204 @@ Porkbun CLI is a command-line interface tool for managing domains, DNS records, 
 
 2. Set up a virtual environment:
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
+
 3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Set environment variables:
+4. Install in development mode:
    ```bash
-   export PORKBUN_API_KEY='your_api_key'
-   export PORKBUN_SECRET_API_KEY='your_secret_api_key'
+   pip install -e .
    ```
+
+## Configuration
+
+You need to set up your Porkbun API credentials. The CLI supports multiple profiles.
+
+### API Access Setup
+
+1. Log in to your Porkbun account
+2. Go to "Account" → "API Access"
+3. Create a new API key and save both the API key and Secret key
+4. Enable API access for each domain you want to manage
+
+### Configure the CLI
+
+```bash
+# Add a new profile
+python -m porkbun.cli config add default --api-key YOUR_API_KEY --secret-key YOUR_SECRET_KEY --make-default
+
+# List profiles
+python -m porkbun.cli config list
+
+# Switch profiles
+python -m porkbun.cli config use profile_name
+```
 
 ## Usage
 
-### General Usage
+Activate your virtual environment if not already active:
+```bash
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-Activate the virtual environment if not already active:
-source venv/bin/activate
+### Testing API Connectivity
 
-Run the CLI:
-python -m porkbun.cli
+```bash
+python -m porkbun.cli account ping
+```
 
-### Commands
+### Domain Management
 
-#### Domain Management
-- List all domains: `python -m porkbun.cli domains list_all`
-- Create a domain: `python -m porkbun.cli domains create <domain> <password>`
-- Delete a domain: `python -m porkbun.cli domains delete <domain>`
-- Update name servers: `python -m porkbun.cli domains update_name_servers <domain> <nameserver1> <nameserver2> ...`
-- Retrieve name servers: `python -m porkbun.cli domains retrieve_name_servers <domain>`
-- List domain contacts: `python -m porkbun.cli domains list_contacts <domain>`
-- Update domain contacts: `python -m porkbun.cli domains update_contacts <domain> <contact1> <contact2> ...`
+List all domains:
+```bash
+python -m porkbun.cli domains list-all
+```
 
-#### DNS Management
-- Create a DNS record: `python -m porkbun.cli dns create_record <domain> <record_type> <content> <ttl>`
-- Retrieve DNS records: `python -m porkbun.cli dns create_record <domain> <record_type> <content> <ttl>`
-- Update a DNS record: `python -m porkbun.cli dns update_record <domain> <record_id> <record_type> <content> <ttl>`
-- Delete a DNS record: `python -m porkbun.cli dns delete_record <domain> <record_id>`
+Check domain availability:
+```bash
+python -m porkbun.cli domains check example.com
+```
 
-#### Email Forwarding
-- Create an email forward: `python -m porkbun.cli email create_forward <domain> <email> <forward_to>`
-- Retrieve email forwards: `python -m porkbun.cli email retrieve_forwards <domain>`
-- Update an email forward: `python -m porkbun.cli email update_forward <domain> <email_id> <email> <forward_to>`
-- Delete an email forward: `python -m porkbun.cli email delete_forward <domain> <email_id>`
+Check domain with price comparison and suggestions:
+```bash
+python -m porkbun.cli domains check example.com --suggest --compare
+```
 
-#### SSL Management
-- Retrieve SSL bundle: `python -m porkbun.cli ssl retrieve_bundle <domain>`
+Register a domain:
+```bash
+python -m porkbun.cli domains register example.com --years 1
+```
 
-#### Account Management
-- Get account details: `python -m porkbun.cli account details`
+Bulk register domains:
+```bash
+python -m porkbun.cli domains bulk domain1.com domain2.com --years 1
+```
 
-#### WHOIS Privacy
-- Enable WHOIS privacy: `python -m porkbun.cli whois enable_privacy <domain>`
-- Disable WHOIS privacy: `python -m porkbun.cli whois disable_privacy <domain>`
-- Retrieve WHOIS privacy status: `python -m porkbun.cli whois disable_privacy <domain>`
+Add domain to price watch list:
+```bash
+python -m porkbun.cli domains check example.com --watch 9.99
+```
+
+View watch list:
+```bash
+python -m porkbun.cli domains watch-list
+```
+
+Check WHOIS information:
+```bash
+python -m porkbun.cli domains whois example.com
+```
+
+### DNS Management
+
+List DNS records:
+```bash
+python -m porkbun.cli dns retrieve example.com
+```
+
+Create DNS record:
+```bash
+python -m porkbun.cli dns create-record example.com A 192.168.1.1 600
+```
+
+Delete DNS record:
+```bash
+python -m porkbun.cli dns delete-record example.com RECORD_ID
+```
+
+Check DNSSEC status:
+```bash
+python -m porkbun.cli dns dnssec status example.com
+```
+
+Enable DNSSEC:
+```bash
+python -m porkbun.cli dns dnssec enable example.com
+```
+
+### SSL Management
+
+Retrieve SSL certificate:
+```bash
+python -m porkbun.cli ssl retrieve example.com
+```
+
+Generate new SSL certificate:
+```bash
+python -m porkbun.cli ssl generate example.com
+```
+
+### Account Management
+
+Check account balance:
+```bash
+python -m porkbun.cli account balance
+```
+
+View recent transactions:
+```bash
+python -m porkbun.cli account transactions --limit 5
+```
+
+### Domain Portfolio Management
+
+List domains with tags/groups:
+```bash
+python -m porkbun.cli account portfolio list-domains
+```
+
+Tag domains:
+```bash
+python -m porkbun.cli account portfolio tag example.com --group clients --tags "important,client1"
+```
+
+View all domain groups:
+```bash
+python -m porkbun.cli account portfolio groups
+```
+
+View all domain tags:
+```bash
+python -m porkbun.cli account portfolio tags
+```
 
 ## Docker
+
 To run the CLI in a Docker container:
 
-1.	Build the Docker image:
+1. Build the Docker image:
    ```bash
    docker build -t porkbun-cli .
    ```
 
-2.	Run the Docker container: 
+2. Run the Docker container:
    ```bash
-   docker run -e PORKBUN_API_KEY='your_api_key' -e PORKBUN_SECRET_API_KEY='your_secret_api_key' porkbun-cli <command>
+   docker run -v ~/.porkbun:/root/.porkbun porkbun-cli config list
+   ```
+
+3. Run commands:
+   ```bash
+   docker run -v ~/.porkbun:/root/.porkbun porkbun-cli domains list-all
    ```
 
 ## Contributing
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
-CLI implementation based on: https://porkbun.com/api/json/v3/documentation#Domain%20Update%20Name%20Servers 
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Install development dependencies (`pip install -r requirements-dev.txt`)
+4. Make your changes
+5. Run tests (`pytest`)
+6. Commit your changes (`git commit -m 'Add some amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+
+This project is licensed under the MIT License - see the LICENSE file for details.

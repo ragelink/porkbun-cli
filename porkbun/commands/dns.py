@@ -1,8 +1,13 @@
 import click
 import json
+import asyncio
 from porkbun.api import make_request
 from porkbun.utils.exceptions import PorkbunAPIError
 from porkbun.utils.validation import validate_domain, validate_ip_address, validate_ttl, validate_record_type
+from rich.console import Console
+from rich.table import Table
+
+console = Console()
 
 @click.group()
 def dns():
@@ -18,11 +23,36 @@ def retrieve(domain):
         raise click.BadParameter("Invalid domain format")
         
     try:
-        result = make_request(f"dns/retrieve/{domain}", {})
-        click.echo(result)
+        result = asyncio.run(make_request(f"dns/retrieve/{domain}", {}))
+        if result.get('status') == 'SUCCESS':
+            records = result.get('records', [])
+            
+            if not records:
+                console.print("[info]No DNS records found[/]")
+                return 0
+                
+            table = Table(title=f"DNS Records for {domain}")
+            table.add_column("Type", style="cyan")
+            table.add_column("Name", style="green")
+            table.add_column("Content", style="yellow")
+            table.add_column("TTL", justify="right")
+            table.add_column("ID", style="dim")
+            
+            for record in records:
+                table.add_row(
+                    record.get('type', ''),
+                    record.get('name', ''),
+                    record.get('content', ''),
+                    str(record.get('ttl', '')),
+                    record.get('id', '')
+                )
+            
+            console.print(table)
+        else:
+            console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
         return 0
     except PorkbunAPIError as e:
-        click.echo(f"Error: {str(e)}")
+        console.print(f"[error]Error: {str(e)}[/]")
         ctx = click.get_current_context()
         ctx.exit(1)
 
@@ -68,12 +98,36 @@ def retrieve_records(domain):
         raise click.BadParameter("Invalid domain format")
         
     try:
-        data = {"domain": domain}
-        result = make_request("dns/retrieve", data)
-        click.echo(result)
+        result = asyncio.run(make_request(f"dns/retrieve/{domain}", {}))
+        if result.get('status') == 'SUCCESS':
+            records = result.get('records', [])
+            
+            if not records:
+                console.print("[info]No DNS records found[/]")
+                return 0
+                
+            table = Table(title=f"DNS Records for {domain}")
+            table.add_column("Type", style="cyan")
+            table.add_column("Name", style="green")
+            table.add_column("Content", style="yellow")
+            table.add_column("TTL", justify="right")
+            table.add_column("ID", style="dim")
+            
+            for record in records:
+                table.add_row(
+                    record.get('type', ''),
+                    record.get('name', ''),
+                    record.get('content', ''),
+                    str(record.get('ttl', '')),
+                    record.get('id', '')
+                )
+            
+            console.print(table)
+        else:
+            console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
         return 0
     except PorkbunAPIError as e:
-        click.echo(f"Error: {str(e)}")
+        console.print(f"[error]Error: {str(e)}[/]")
         ctx = click.get_current_context()
         ctx.exit(1)
 
@@ -186,3 +240,143 @@ def delete_record(domain, record_id):
         click.echo(f"Error: {str(e)}")
         ctx = click.get_current_context()
         ctx.exit(1)
+
+@dns.group()
+def dnssec():
+    """DNSSEC management commands"""
+    pass
+
+@dnssec.command()
+@click.argument('domain')
+def status(domain: str):
+    """Check DNSSEC status for a domain."""
+    if not validate_domain(domain):
+        raise click.BadParameter("Invalid domain format")
+        
+    try:
+        result = make_request(f"dns/getDNSSEC/{domain}", {})
+        if result.get('status') == 'SUCCESS':
+            enabled = result.get('dnssec', False)
+            status = "[green]Enabled[/]" if enabled else "[red]Disabled[/]"
+            console.print(f"DNSSEC is {status} for {domain}")
+            
+            if enabled and result.get('keys'):
+                table = Table(title="DNSSEC Keys")
+                table.add_column("Type", style="cyan")
+                table.add_column("Algorithm", style="blue")
+                table.add_column("Key Tag", style="dim")
+                table.add_column("Public Key", style="green")
+                
+                for key in result['keys']:
+                    table.add_row(
+                        key.get('type', 'N/A'),
+                        key.get('algorithm', 'N/A'),
+                        key.get('keyTag', 'N/A'),
+                        key.get('publicKey', 'N/A')
+                    )
+                
+                console.print(table)
+        else:
+            console.print(f"[error]Error checking DNSSEC status: {result.get('message')}[/]")
+    except Exception as e:
+        console.print(f"[error]Error checking DNSSEC status: {str(e)}[/]")
+
+@dnssec.command()
+@click.argument('domain')
+def enable(domain: str):
+    """Enable DNSSEC for a domain."""
+    if not validate_domain(domain):
+        raise click.BadParameter("Invalid domain format")
+        
+    try:
+        result = make_request(f"dns/enableDNSSEC/{domain}", {})
+        if result.get('status') == 'SUCCESS':
+            console.print(f"[success]Successfully enabled DNSSEC for {domain}[/]")
+            
+            # Show DS records for registrar configuration
+            if result.get('dsRecords'):
+                table = Table(title="DS Records (Configure these at your registrar)")
+                table.add_column("Key Tag", style="cyan")
+                table.add_column("Algorithm", style="blue")
+                table.add_column("Digest Type", style="dim")
+                table.add_column("Digest", style="green")
+                
+                for record in result['dsRecords']:
+                    table.add_row(
+                        str(record.get('keyTag', 'N/A')),
+                        str(record.get('algorithm', 'N/A')),
+                        str(record.get('digestType', 'N/A')),
+                        record.get('digest', 'N/A')
+                    )
+                
+                console.print(table)
+                console.print("\n[warning]Important: Configure these DS records at your domain registrar to complete DNSSEC setup[/]")
+        else:
+            console.print(f"[error]Error enabling DNSSEC: {result.get('message')}[/]")
+    except Exception as e:
+        console.print(f"[error]Error enabling DNSSEC: {str(e)}[/]")
+
+@dnssec.command()
+@click.argument('domain')
+def disable(domain: str):
+    """Disable DNSSEC for a domain."""
+    if not validate_domain(domain):
+        raise click.BadParameter("Invalid domain format")
+        
+    try:
+        result = make_request(f"dns/disableDNSSEC/{domain}", {})
+        if result.get('status') == 'SUCCESS':
+            console.print(f"[success]Successfully disabled DNSSEC for {domain}[/]")
+            console.print("[warning]Remember to remove DS records from your domain registrar[/]")
+        else:
+            console.print(f"[error]Error disabling DNSSEC: {result.get('message')}[/]")
+    except Exception as e:
+        console.print(f"[error]Error disabling DNSSEC: {str(e)}[/]")
+
+@dnssec.command()
+@click.argument('domain')
+def rotate_keys(domain: str):
+    """Rotate DNSSEC keys for a domain."""
+    if not validate_domain(domain):
+        raise click.BadParameter("Invalid domain format")
+        
+    try:
+        # First check if DNSSEC is enabled
+        status_result = make_request(f"dns/getDNSSEC/{domain}", {})
+        if not status_result.get('dnssec', False):
+            console.print(f"[error]DNSSEC is not enabled for {domain}[/]")
+            return
+            
+        # Disable DNSSEC
+        disable_result = make_request(f"dns/disableDNSSEC/{domain}", {})
+        if disable_result.get('status') != 'SUCCESS':
+            console.print(f"[error]Error disabling DNSSEC: {disable_result.get('message')}[/]")
+            return
+            
+        # Re-enable DNSSEC to generate new keys
+        enable_result = make_request(f"dns/enableDNSSEC/{domain}", {})
+        if enable_result.get('status') == 'SUCCESS':
+            console.print(f"[success]Successfully rotated DNSSEC keys for {domain}[/]")
+            
+            # Show new DS records
+            if enable_result.get('dsRecords'):
+                table = Table(title="New DS Records (Update these at your registrar)")
+                table.add_column("Key Tag", style="cyan")
+                table.add_column("Algorithm", style="blue")
+                table.add_column("Digest Type", style="dim")
+                table.add_column("Digest", style="green")
+                
+                for record in enable_result['dsRecords']:
+                    table.add_row(
+                        str(record.get('keyTag', 'N/A')),
+                        str(record.get('algorithm', 'N/A')),
+                        str(record.get('digestType', 'N/A')),
+                        record.get('digest', 'N/A')
+                    )
+                
+                console.print(table)
+                console.print("\n[warning]Important: Update these DS records at your domain registrar[/]")
+        else:
+            console.print(f"[error]Error re-enabling DNSSEC: {enable_result.get('message')}[/]")
+    except Exception as e:
+        console.print(f"[error]Error rotating DNSSEC keys: {str(e)}[/]")

@@ -5,7 +5,23 @@ class PorkbunError(Exception):
     pass
 
 class PorkbunAPIError(PorkbunError):
-    """Raised when there's an error communicating with the Porkbun API."""
+    """Exception raised for API errors."""
+    pass
+
+class ConfigError(PorkbunError):
+    """Exception raised for configuration errors."""
+    pass
+
+class ValidationError(PorkbunError):
+    """Exception raised for validation errors."""
+    pass
+
+class RateLimitError(PorkbunError):
+    """Exception raised when API rate limit is exceeded."""
+    pass
+
+class APIError(PorkbunError):
+    """Exception raised for API errors."""
     pass
 
 class PorkbunConfigError(PorkbunError):

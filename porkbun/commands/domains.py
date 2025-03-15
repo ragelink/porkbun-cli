@@ -1,4 +1,5 @@
 import click
+import asyncio
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
@@ -47,6 +48,11 @@ def register():
 @domains.group()
 def transfer():
     """Domain transfer commands"""
+    pass
+
+@domains.group()
+def renew():
+    """Domain renewal commands"""
     pass
 
 def load_domains_from_file(file_path: str) -> List[str]:
@@ -238,103 +244,102 @@ def print_price_comparison(comparisons: List[Dict]) -> None:
 @domains.command()
 def list_all():
     """List all domains"""
-    result = make_request("domain/listAll", {})
-    click.echo(result)
+    try:
+        result = asyncio.run(make_request("domain/listAll", {}))
+        if result.get('status') == 'SUCCESS':
+            domains = result.get('domains', [])
+            
+            if not domains:
+                console.print("[info]No domains found[/]")
+                return
+                
+            table = Table(title="Your Domains")
+            table.add_column("Domain", style="cyan")
+            table.add_column("TLD", style="blue")
+            table.add_column("Status", style="green")
+            table.add_column("Expiry Date", style="yellow")
+            table.add_column("Auto-Renew", style="magenta")
+            table.add_column("WHOIS Privacy", style="red")
+            
+            # Sort domains by expiry date
+            domains.sort(key=lambda x: x.get('expireDate', ''))
+            
+            for domain in domains:
+                table.add_row(
+                    domain.get('domain', 'N/A'),
+                    domain.get('tld', 'N/A'),
+                    domain.get('status', 'N/A'),
+                    domain.get('expireDate', 'N/A'),
+                    "✓" if domain.get('autoRenew') == '1' else "✗",
+                    "✓" if domain.get('whoisPrivacy') == '1' else "✗"
+                )
+            
+            console.print(table)
+            console.print(f"\nTotal domains: [cyan]{len(domains)}[/]")
+        else:
+            console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
+    except Exception as e:
+        console.print(f"[error]Error: {str(e)}[/]")
 
 # Check domain availability
 @domains.command()
-@click.option('-d', '--domains', multiple=True, help='One or more domains to check')
-@click.option('-f', '--file', type=click.Path(exists=True), help='File containing domains (one per line)')
-@click.option('--delay', type=float, default=10.0, help='Delay between requests in seconds (default: 10.0)')
-@click.option('--no-progress', is_flag=True, help='Disable progress bar')
-@click.option('--suggest', is_flag=True, help='Suggest alternative domains')
-@click.option('--compare-tlds', is_flag=True, help='Compare prices across TLDs')
-@click.option('--export', type=click.Choice(['json', 'csv']), help='Export results to file')
-@click.option('--output', type=click.Path(), help='Output file for export')
+@click.argument('domain')
+@click.option('--suggest/--no-suggest', default=True, help='Show alternative domain suggestions')
+@click.option('--compare/--no-compare', default=True, help='Compare prices across TLDs')
 @click.option('--watch', type=float, help='Add to watch list with target price')
-def check(domains: Optional[tuple], file: Optional[str], delay: float, no_progress: bool,
-         suggest: bool, compare_tlds: bool, export: Optional[str], output: Optional[str],
-         watch: Optional[float]):
-    """Check domain availability and compare prices."""
-    # Get domains from either command line arguments or file
-    domain_list = list(domains) if domains else load_domains_from_file(file)
-    if not domain_list:
-        console.print("[error]Error: No domains specified[/]")
-        raise click.Abort()
-
-    # Get TLD pricing if needed for suggestions or comparison
-    tld_pricing = get_tld_pricing() if (suggest or compare_tlds) else {}
-
-    results = []
-    all_suggestions = []
-
-    # Check each domain with progress bar
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-        TimeElapsedColumn(),
-        console=console,
-        disable=no_progress
-    ) as progress:
-        task = progress.add_task(f"Checking {len(domain_list)} domains...", total=len(domain_list))
+@click.option('--export', type=click.Choice(['json', 'csv']), help='Export results format')
+@click.option('--output', type=click.Path(), help='Output file path')
+def check(domain: str, suggest: bool, compare: bool, watch: Optional[float],
+         export: Optional[str], output: Optional[str]):
+    """Check domain availability and pricing."""
+    try:
+        # Get TLD pricing if needed for suggestions or comparison
+        tld_pricing = get_tld_pricing() if (suggest or compare) else {}
         
-        for i, domain in enumerate(domain_list, 1):
-            progress.update(task, description=f"Checking domain {i}/{len(domain_list)}: {domain}")
-            try:
-                data = make_request(f"domain/checkDomain/{domain}", {})
-                result = {
-                    'domain': domain,
-                    'success': data.get('status') == 'SUCCESS',
-                    'available': data.get('response', {}).get('avail') == 'yes',
-                    'price': data.get('response', {}).get('price'),
-                    'error': data.get('message') if data.get('status') != 'SUCCESS' else None
-                }
-                results.append(result)
-                print_check_result(result)
-
-                # Add to watch list if requested and available
-                if watch is not None and result['success'] and result['available']:
-                    save_to_watch_list(domain, watch)
-                    console.print(f"[info]Added {domain} to watch list with target price ${watch}[/]")
-
-                # Get suggestions for unavailable domains
-                if suggest and result['success'] and not result['available']:
-                    suggestions = suggest_domains(domain, tld_pricing)
-                    if suggestions:
-                        all_suggestions.extend(suggestions)
-                        print_suggestions(suggestions)
-
-                # Compare TLD prices
-                if compare_tlds and result['success']:
-                    comparisons = compare_tld_prices(domain, tld_pricing)
-                    if comparisons:
-                        print_price_comparison(comparisons)
-
-            except Exception as e:
-                console.print(f"[error]Error checking {domain}: {str(e)}[/]")
-                results.append({
-                    'domain': domain,
-                    'success': False,
-                    'available': False,
-                    'price': None,
-                    'error': str(e)
-                })
+        # Check domain availability
+        result = make_request(f"domain/checkDomain/{domain}", {})
+        check_result = {
+            'domain': domain,
+            'success': result.get('status') == 'SUCCESS',
+            'available': result.get('response', {}).get('avail') == 'yes',
+            'price': result.get('response', {}).get('price', 'N/A'),
+            'error': result.get('message') if result.get('status') != 'SUCCESS' else None
+        }
+        
+        # Print result
+        print_check_result(check_result)
+        
+        # Show suggestions if requested
+        if suggest and check_result['success'] and not check_result['available']:
+            suggestions = suggest_domains(domain, tld_pricing)
+            print_suggestions(suggestions)
+        
+        # Show price comparison if requested
+        if compare and tld_pricing:
+            comparisons = compare_tld_prices(domain, tld_pricing)
+            print_price_comparison(comparisons)
+        
+        # Add to watch list if requested
+        if watch is not None and check_result['success'] and not check_result['available']:
+            save_to_watch_list(domain, watch)
+            console.print(f"[success]Added {domain} to watch list with target price ${watch}[/]")
+        
+        # Export results if requested
+        if export and output:
+            results = [check_result]
+            if suggest:
+                results.extend([{
+                    'domain': s['domain'],
+                    'success': True,
+                    'available': True,
+                    'price': s['price'],
+                    'error': None
+                } for s in suggestions])
+            export_results(results, export, output)
+            console.print(f"[success]Results exported to {output}[/]")
             
-            if i < len(domain_list):
-                progress.update(task, description=f"Waiting {delay}s before next request...")
-                time.sleep(delay)
-            
-            progress.advance(task)
-
-    # Print final summary
-    print_check_summary(results, tld_pricing)
-
-    # Export results if requested
-    if export and output:
-        export_results(results, export, output)
-        console.print(f"\n[success]Results exported to {output}[/]")
+    except Exception as e:
+        console.print(f"[error]Error checking domain: {str(e)}[/]")
 
 # Create a new domain
 @domains.command()
@@ -916,3 +921,232 @@ def watch_list():
             )
 
     console.print(table)
+
+@renew.command()
+@click.argument('domains', nargs=-1)
+@click.option('--file', '-f', type=click.Path(exists=True), help='File containing domains')
+@click.option('--years', type=int, default=1, help='Number of years to renew for')
+@click.option('--force', is_flag=True, help='Skip confirmation')
+def bulk(domains: tuple, file: Optional[str], years: int, force: bool):
+    """Renew multiple domains."""
+    domain_list = list(domains) if domains else load_domains_from_file(file)
+    if not domain_list:
+        console.print("[error]Error: No domains specified[/]")
+        raise click.Abort()
+
+    # Get renewal prices
+    renewals = []
+    total_cost = 0.0
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TimeElapsedColumn(),
+        console=console
+    ) as progress:
+        task = progress.add_task("Checking renewal prices...", total=len(domain_list))
+        
+        for domain in domain_list:
+            progress.update(task, description=f"Checking {domain}")
+            try:
+                result = make_request(f"domain/getRenewalPrice/{domain}", {})
+                if result.get('status') == 'SUCCESS':
+                    price = float(result.get('renewalPrice', 0))
+                    expiry = result.get('expirationDate', 'Unknown')
+                    renewals.append({
+                        'domain': domain,
+                        'price': price,
+                        'years': years,
+                        'expiry': expiry
+                    })
+                    total_cost += price * years
+                else:
+                    console.print(f"[error]Error getting price for {domain}: {result.get('message')}[/]")
+            except Exception as e:
+                console.print(f"[error]Error checking {domain}: {str(e)}[/]")
+            progress.advance(task)
+            time.sleep(10)  # Rate limit compliance
+
+    if not renewals:
+        console.print("[error]No domains available for renewal[/]")
+        return
+
+    # Show renewal summary
+    table = Table(title="Renewal Summary")
+    table.add_column("Domain", style="cyan")
+    table.add_column("Current Expiry", style="dim")
+    table.add_column("Years", justify="right")
+    table.add_column("Price/Year", justify="right")
+    table.add_column("Total", justify="right", style="bold")
+
+    for renewal in renewals:
+        table.add_row(
+            renewal['domain'],
+            renewal['expiry'],
+            str(renewal['years']),
+            f"${renewal['price']:.2f}",
+            f"${renewal['price'] * renewal['years']:.2f}"
+        )
+
+    console.print(table)
+    console.print(f"\nTotal renewal cost: [green]${total_cost:.2f}[/]")
+
+    if not force and not click.confirm("\nDo you want to proceed with renewal?"):
+        return
+
+    # Process renewals
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TimeElapsedColumn(),
+        console=console
+    ) as progress:
+        task = progress.add_task("Processing renewals...", total=len(renewals))
+        
+        for renewal in renewals:
+            progress.update(task, description=f"Renewing {renewal['domain']}")
+            try:
+                result = make_request("domain/renew", {
+                    "domain": renewal['domain'],
+                    "years": renewal['years']
+                })
+                if result.get('status') == 'SUCCESS':
+                    console.print(f"[success]Successfully renewed {renewal['domain']} for {renewal['years']} years[/]")
+                else:
+                    console.print(f"[error]Failed to renew {renewal['domain']}: {result.get('message')}[/]")
+            except Exception as e:
+                console.print(f"[error]Error renewing {renewal['domain']}: {str(e)}[/]")
+            progress.advance(task)
+            time.sleep(10)  # Rate limit compliance
+
+@renew.command()
+def auto():
+    """Manage auto-renewal settings."""
+    try:
+        result = make_request("domain/listAll", {})
+        if not result.get('domains'):
+            console.print("[info]No domains found[/]")
+            return
+
+        table = Table(title="Auto-Renewal Settings")
+        table.add_column("Domain", style="cyan")
+        table.add_column("Auto-Renewal", style="bold")
+        table.add_column("Expiry Date", style="dim")
+        table.add_column("Renewal Price", justify="right")
+
+        for domain in result['domains']:
+            domain_name = domain['domain']
+            try:
+                info = make_request(f"domain/getRenewalPrice/{domain_name}", {})
+                auto_renewal = "[green]Enabled[/]" if domain.get('autoRenew') else "[red]Disabled[/]"
+                expiry = info.get('expirationDate', 'Unknown')
+                price = f"${float(info.get('renewalPrice', 0)):.2f}"
+                
+                table.add_row(
+                    domain_name,
+                    auto_renewal,
+                    expiry,
+                    price
+                )
+            except Exception as e:
+                table.add_row(
+                    domain_name,
+                    "[yellow]Unknown[/]",
+                    "Error",
+                    str(e)
+                )
+            time.sleep(10)  # Rate limit compliance
+
+        console.print(table)
+    except Exception as e:
+        console.print(f"[error]Error retrieving auto-renewal settings: {str(e)}[/]")
+
+@renew.command()
+@click.argument('domain')
+@click.option('--enable/--disable', default=True, help='Enable or disable auto-renewal')
+def set_auto(domain: str, enable: bool):
+    """Enable or disable auto-renewal for a domain."""
+    try:
+        result = make_request(f"domain/setAutoRenew/{domain}", {"autoRenew": enable})
+        if result.get('status') == 'SUCCESS':
+            status = "enabled" if enable else "disabled"
+            console.print(f"[success]Successfully {status} auto-renewal for {domain}[/]")
+        else:
+            console.print(f"[error]Failed to update auto-renewal setting: {result.get('message')}[/]")
+    except Exception as e:
+        console.print(f"[error]Error updating auto-renewal setting: {str(e)}[/]")
+
+@renew.command()
+def expiring():
+    """List domains expiring soon."""
+    try:
+        result = make_request("domain/listAll", {})
+        if not result.get('domains'):
+            console.print("[info]No domains found[/]")
+            return
+
+        # Get current time and filter domains expiring in the next 30 days
+        current_time = time.time()
+        expiring_domains = []
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TimeElapsedColumn(),
+            console=console
+        ) as progress:
+            task = progress.add_task("Checking expiration dates...", total=len(result['domains']))
+            
+            for domain in result['domains']:
+                domain_name = domain['domain']
+                progress.update(task, description=f"Checking {domain_name}")
+                try:
+                    info = make_request(f"domain/getRenewalPrice/{domain_name}", {})
+                    expiry_date = info.get('expirationDate')
+                    if expiry_date:
+                        expiry_time = time.mktime(time.strptime(expiry_date, "%Y-%m-%d"))
+                        days_until_expiry = (expiry_time - current_time) / (24 * 60 * 60)
+                        
+                        if days_until_expiry <= 30:
+                            expiring_domains.append({
+                                'domain': domain_name,
+                                'expiry': expiry_date,
+                                'days': int(days_until_expiry),
+                                'price': float(info.get('renewalPrice', 0)),
+                                'auto_renew': domain.get('autoRenew', False)
+                            })
+                except Exception as e:
+                    console.print(f"[error]Error checking {domain_name}: {str(e)}[/]")
+                progress.advance(task)
+                time.sleep(10)  # Rate limit compliance
+
+        if not expiring_domains:
+            console.print("[info]No domains expiring in the next 30 days[/]")
+            return
+
+        # Sort by days until expiry
+        expiring_domains.sort(key=lambda x: x['days'])
+
+        table = Table(title="Domains Expiring Soon")
+        table.add_column("Domain", style="cyan")
+        table.add_column("Days Left", justify="right")
+        table.add_column("Expiry Date", style="dim")
+        table.add_column("Renewal Price", justify="right")
+        table.add_column("Auto-Renewal", style="bold")
+
+        for domain in expiring_domains:
+            days_style = "red" if domain['days'] <= 7 else "yellow" if domain['days'] <= 14 else "green"
+            table.add_row(
+                domain['domain'],
+                f"[{days_style}]{domain['days']}[/]",
+                domain['expiry'],
+                f"${domain['price']:.2f}",
+                "[green]Yes[/]" if domain['auto_renew'] else "[red]No[/]"
+            )
+
+        console.print(table)
+    except Exception as e:
+        console.print(f"[error]Error checking expiring domains: {str(e)}[/]")
