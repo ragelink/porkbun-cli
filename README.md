@@ -360,6 +360,9 @@ Included service templates make it easy to set up domains with popular services:
 - **AWS Route 53** - DNS configuration for AWS services
 - **GitHub Pages** - DNS configuration for GitHub Pages
 - **Vercel** - DNS configuration for Vercel deployments
+- **Shopify** - DNS configuration for Shopify e-commerce stores
+- **Digital Ocean** - DNS configuration for Digital Ocean droplets
+- **Firebase** - DNS configuration for Firebase-hosted apps
 
 Use the helper script to set up a domain with service templates:
 

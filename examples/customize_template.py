@@ -52,6 +52,13 @@ def validate_template(template):
         record_type = record['type']
         content = record['content']
         
+        # Skip validation for placeholder values that will be replaced
+        placeholder_values = ['DROPLET_IP', 'DOMAIN', 'FIREBASE_APP_ID', 'SHOPIFY_SUBDOMAIN',
+                             'REPLACE_WITH_YOUR_VERIFICATION_CODE', 'USERNAME']
+        if any(placeholder in content for placeholder in placeholder_values):
+            logger.warning(f"Record {i}: Contains placeholder value. Will skip validation: {content}")
+            continue
+        
         # A record validation (IPv4)
         if record_type == 'A':
             import re
@@ -173,13 +180,13 @@ def customize_template(template_file, domain, output_file=None, region=None):
                 if 'REGION' in record.get('content', ''):
                     record['content'] = record['content'].replace('REGION', aws_region)
                     
-            # AWS CloudFront records
-            if 'cloudfront.net' in record.get('content', '') and 'DOMAIN' in record.get('content', ''):
-                record['content'] = record['content'].replace('DOMAIN', domain_hyphenated)
-                
             # AWS SES and other region-specific records
             if 'REGION' in record.get('content', ''):
                 record['content'] = record['content'].replace('REGION', aws_region)
+                
+            # AWS CloudFront records
+            if 'cloudfront.net' in record.get('content', '') and 'DOMAIN' in record.get('content', ''):
+                record['content'] = record['content'].replace('DOMAIN', domain_hyphenated)
                 
             # GitHub Pages challenge record
             if record['type'] == 'TXT' and record['name'].startswith('_github-pages-challenge-'):
@@ -188,6 +195,25 @@ def customize_template(template_file, domain, output_file=None, region=None):
             # GitHub Pages CNAME records
             if record['type'] == 'CNAME' and 'USERNAME.github.io' in record.get('content', ''):
                 record['content'] = record['content'].replace('USERNAME', domain_prefix)
+                
+            # Firebase CNAME records
+            if record['type'] == 'CNAME' and 'FIREBASE_APP_ID.web.app' in record.get('content', ''):
+                firebase_app_id = domain.replace('.', '-')
+                record['content'] = record['content'].replace('FIREBASE_APP_ID', firebase_app_id)
+                
+            # Shopify records
+            if record['type'] == 'CNAME' and 'SHOPIFY_SUBDOMAIN.myshopify.com' in record.get('content', ''):
+                shopify_subdomain = domain.replace('.', '-')
+                record['content'] = record['content'].replace('SHOPIFY_SUBDOMAIN', shopify_subdomain)
+                
+            # Digital Ocean records
+            if record['content'] == 'DOMAIN':
+                record['content'] = domain
+                
+            if record['content'] == 'DROPLET_IP':
+                # Use a placeholder IP, user will need to replace with actual Droplet IP
+                record['content'] = '104.131.0.0'
+                logger.warning(f"Record {record['name']}: Using placeholder Droplet IP. Replace with your actual IP.")
                 
             # SPF records with domain placeholder
             if record['type'] == 'TXT' and 'v=spf1' in record.get('content', ''):

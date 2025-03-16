@@ -13,6 +13,9 @@ The following templates are available in the `examples/templates` directory:
 - **aws_route53.json**: DNS configuration for AWS services
 - **github_pages.json**: DNS configuration for GitHub Pages
 - **vercel.json**: DNS configuration for Vercel deployments
+- **shopify.json**: DNS configuration for Shopify e-commerce stores
+- **digitalocean.json**: DNS configuration for Digital Ocean droplets
+- **firebase.json**: DNS configuration for Firebase-hosted apps
 
 ## Using the Templates
 
@@ -176,4 +179,69 @@ To apply with automatic customization:
 
 ```bash
 python examples/setup_domain_services.py example.com --service vercel
+```
+
+### Shopify
+
+The Shopify template includes DNS records for setting up an e-commerce store with Shopify:
+
+- **A Record**: Points to Shopify's IP address
+- **CNAME Records**: For www, cdn, checkout, assets, and shop subdomains
+- **Shopify Verification TXT Record**: For domain verification
+- **SPF and DMARC Records**: For email validation
+- **MX Record**: For Shopify email handling
+
+#### Custom Values to Replace:
+
+- `SHOPIFY_SUBDOMAIN`: Your Shopify store subdomain (automatically replaced with domain-hyphenated)
+- `shopify-verification`: Update with your Shopify verification code
+
+To apply with automatic customization:
+
+```bash
+python examples/setup_domain_services.py example.com --service shopify
+```
+
+### Digital Ocean
+
+The Digital Ocean template includes DNS records for hosting on Digital Ocean:
+
+- **A Records**: For primary domain and www (pointing to your Droplet IP)
+- **CNAME Records**: For various subdomains and environments
+- **DigitalOcean Verification TXT Record**: For domain verification
+- **SPF and DMARC Records**: For email validation
+- **MX Records**: For Digital Ocean email handling
+- **Spaces CNAME Record**: For Digital Ocean Spaces object storage
+
+#### Custom Values to Replace:
+
+- `DROPLET_IP`: Replace with your actual Droplet's IP address
+- `do-verification`: Update with your Digital Ocean verification code
+
+To apply with automatic customization:
+
+```bash
+python examples/setup_domain_services.py example.com --service digitalocean --droplet-ip 104.248.112.123
+```
+
+### Firebase
+
+The Firebase template includes DNS records for hosting a web app on Firebase:
+
+- **A Records**: Points to Firebase hosting IP addresses
+- **CNAME Records**: For www, app, api, and other subdomains
+- **Firebase Verification TXT Record**: For domain verification
+- **SPF and DMARC Records**: For email validation
+- **MX Records**: For Google mail handling (Firebase uses Google services)
+
+#### Custom Values to Replace:
+
+- `FIREBASE_APP_ID`: Your Firebase project ID (automatically replaced with domain-hyphenated)
+- `firebase`: Update with your Firebase verification code
+- `google-site-verification`: Update with your Google verification code
+
+To apply with automatic customization:
+
+```bash
+python examples/setup_domain_services.py example.com --service firebase
 ``` 

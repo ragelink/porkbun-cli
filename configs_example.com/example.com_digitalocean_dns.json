@@ -1,0 +1,88 @@
+[
+  {
+    "type": "A",
+    "name": "@",
+    "content": "104.131.0.0",
+    "ttl": 1800
+  },
+  {
+    "type": "A",
+    "name": "www",
+    "content": "104.131.0.0",
+    "ttl": 1800
+  },
+  {
+    "type": "CNAME",
+    "name": "api",
+    "content": "example.com",
+    "ttl": 1800
+  },
+  {
+    "type": "CNAME",
+    "name": "app",
+    "content": "example.com",
+    "ttl": 1800
+  },
+  {
+    "type": "CNAME",
+    "name": "dev",
+    "content": "example.com",
+    "ttl": 1800
+  },
+  {
+    "type": "CNAME",
+    "name": "staging",
+    "content": "example.com",
+    "ttl": 1800
+  },
+  {
+    "type": "CNAME",
+    "name": "*.dev",
+    "content": "example.com",
+    "ttl": 1800
+  },
+  {
+    "type": "CNAME",
+    "name": "*.staging",
+    "content": "example.com",
+    "ttl": 1800
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:_spf.digitalocean.com include:_spf.google.com ~all",
+    "ttl": 1800
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "ttl": 1800
+  },
+  {
+    "type": "TXT",
+    "name": "do-verification",
+    "content": "REPLACE_WITH_YOUR_DIGITALOCEAN_VERIFICATION_CODE",
+    "ttl": 1800
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mx1.digitalocean.com",
+    "ttl": 1800,
+    "priority": 10
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mx2.digitalocean.com",
+    "ttl": 1800,
+    "priority": 20
+  },
+  {
+    "type": "CNAME",
+    "name": "spaces",
+    "content": "nyc3.digitaloceanspaces.com",
+    "ttl": 1800
+  }
+]

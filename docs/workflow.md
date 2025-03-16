@@ -169,6 +169,9 @@ The following service templates are available in the `examples/templates/` direc
 - `aws_route53.json` - DNS configuration for AWS services
 - `github_pages.json` - DNS configuration for GitHub Pages
 - `vercel.json` - DNS configuration for Vercel deployments
+- `shopify.json` - DNS configuration for Shopify e-commerce stores
+- `digitalocean.json` - DNS configuration for Digital Ocean droplets
+- `firebase.json` - DNS configuration for Firebase-hosted apps
 
 ### Using Service Templates
 

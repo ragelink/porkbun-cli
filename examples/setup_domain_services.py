@@ -79,7 +79,10 @@ def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, r
             "netlify": templates_dir / "netlify.json",
             "aws": templates_dir / "aws_route53.json",
             "github": templates_dir / "github_pages.json",
-            "vercel": templates_dir / "vercel.json"
+            "vercel": templates_dir / "vercel.json",
+            "shopify": templates_dir / "shopify.json",
+            "digitalocean": templates_dir / "digitalocean.json",
+            "firebase": templates_dir / "firebase.json"
         }
         
         if service not in template_paths:
@@ -147,12 +150,16 @@ def main():
         parser = argparse.ArgumentParser(description="Set up domain with various service configurations")
         parser.add_argument("domain", help="Domain to configure")
         parser.add_argument("--service", 
-                            choices=["cloudflare", "google", "microsoft", "netlify", "aws", "github", "vercel", "all"], 
+                            choices=["cloudflare", "google", "microsoft", "netlify", "aws", 
+                                     "github", "vercel", "shopify", "digitalocean", "firebase", "all"], 
                             required=True, help="Service to configure")
         parser.add_argument("--output-dir", help="Directory to save configuration files")
         parser.add_argument("--dry-run", action="store_true", help="Preview without making changes")
         parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
         parser.add_argument("--region", help="AWS region (only for AWS template)")
+        parser.add_argument("--droplet-ip", help="Actual IP address of your DigitalOcean droplet")
+        parser.add_argument("--firebase-app-id", help="Firebase app ID (if different from domain)")
+        parser.add_argument("--shopify-subdomain", help="Shopify subdomain (if different from domain)")
         
         args = parser.parse_args()
         
@@ -168,7 +175,8 @@ def main():
             sys.exit(1)
             
         if args.service == "all":
-            services = ["cloudflare", "google", "microsoft", "netlify", "aws", "github", "vercel"]
+            services = ["cloudflare", "google", "microsoft", "netlify", "aws", 
+                        "github", "vercel", "shopify", "digitalocean", "firebase"]
             logger.info(f"Setting up domain {args.domain} with all services: {', '.join(services)}")
         else:
             services = [args.service]

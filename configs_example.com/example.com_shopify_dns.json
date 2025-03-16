@@ -1,0 +1,75 @@
+[
+  {
+    "type": "A",
+    "name": "@",
+    "content": "23.227.38.65",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "www",
+    "content": "shops.myshopify.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "cdn",
+    "content": "cdn.shopify.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "checkout",
+    "content": "checkout.shopify.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "assets",
+    "content": "assets.shopify.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "shop",
+    "content": "example-com.myshopify.com",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:shops.shopify.com include:_spf.google.com ~all",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "shopify-verification",
+    "content": "REPLACE_WITH_YOUR_SHOPIFY_VERIFICATION_CODE",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "ttl": 3600
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mail.shopify.com",
+    "ttl": 3600,
+    "priority": 10
+  },
+  {
+    "type": "CNAME",
+    "name": "shopify1",
+    "content": "shops.shopify.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "shopify2",
+    "content": "shops.shopify.com",
+    "ttl": 3600
+  }
+]
