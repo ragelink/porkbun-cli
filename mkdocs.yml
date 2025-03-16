@@ -3,6 +3,7 @@ site_description: Command-line interface for managing Porkbun domains and servic
 repo_url: https://github.com/ragelink/porkbun-cli
 repo_name: ragelink/porkbun-cli
 edit_uri: edit/main/docs/
+site_url: https://ragelink.github.io/porkbun-cli/
 
 theme:
   name: material
@@ -83,33 +84,16 @@ nav:
   - Getting Started:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md
-    - Configuration: getting-started/configuration.md
-  - User Guide:
-    - Domain Management:
-      - Checking Domains: user-guide/domains/checking.md
-      - Registration: user-guide/domains/registration.md
-      - Transfer: user-guide/domains/transfer.md
-      - Renewal: user-guide/domains/renewal.md
-    - DNS Management:
-      - Record Management: user-guide/dns/records.md
-      - DNSSEC: user-guide/dns/dnssec.md
-      - Templates: user-guide/dns/templates.md
-    - SSL Certificates:
-      - Management: user-guide/ssl/management.md
-      - Installation: user-guide/ssl/installation.md
-    - Monitoring:
-      - Domain Monitoring: user-guide/monitoring/domains.md
-      - Health Checks: user-guide/monitoring/health.md
-    - Automation:
-      - Scripts: user-guide/automation/scripts.md
-      - Webhooks: user-guide/automation/webhooks.md
-      - Scheduling: user-guide/automation/scheduling.md
-  - API Reference:
-    - CLI Commands: api/commands.md
-    - Python API: api/python.md
+  - Reference:
+    - Commands: api/commands.md
+    - Service Templates: service_templates.md
+    - Workflows: workflow.md
+    - Domain Setup: domain_setup.md
   - Development:
     - Contributing: development/contributing.md
     - Development Setup: development/setup.md
     - Testing: development/testing.md
-  - FAQ: faq.md
+  - Examples: examples.md
+  - Troubleshooting: troubleshooting.md
+  - Quick Reference: quick-reference.md
   - Changelog: CHANGELOG.md 

@@ -107,6 +107,6 @@ porkbun domains --help
 ## Next Steps
 
 - Explore the [Commands Reference](../api/commands.md) for a complete list of commands
-- Check out the [Domain Management Guide](../user-guide/domains/checking.md) for more domain operations
-- Learn about [DNS Management](../user-guide/dns/records.md) for advanced DNS operations
-- See [Service Templates](../service_templates.md) for setting up domains with popular services 
+- Check out the [Service Templates](../service_templates.md) for setting up domains with popular services
+- Learn about [Workflows](../workflow.md) for automating domain management tasks
+- See [Examples](../examples.md) for more usage examples 

@@ -145,9 +145,9 @@ python -m porkbun.cli account portfolio groups
 ## Getting Help
 
 - Check the [Quick Start Guide](getting-started/quickstart.md) for basic usage
-- Browse the [User Guide](user-guide/domains/checking.md) for detailed instructions
-- View the [API Reference](api/commands.md) for command details
-- Read the [FAQ](faq.md) for common questions
+- Browse the [Commands Reference](api/commands.md) for command details
+- View the [Service Templates](service_templates.md) for domain setup options
+- Read the [Troubleshooting Guide](troubleshooting.md) for common issues
 - Join our [GitHub Discussions](https://github.com/ragelink/porkbun-cli/discussions) for community support
 
 ## Troubleshooting
