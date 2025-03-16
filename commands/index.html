@@ -1,0 +1,1782 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Command-line interface for managing Porkbun domains and services">
+      
+      
+      
+        <link rel="canonical" href="https://ragelink.github.io/porkbun-cli/commands/">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
+    
+    
+      
+        <title>Porkbun CLI Command Reference - Porkbun CLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="Porkbun CLI Command Reference - Porkbun CLI" >
+      
+        <meta  property="og:description"  content="Command-line interface for managing Porkbun domains and services" >
+      
+        <meta  property="og:image"  content="https://ragelink.github.io/porkbun-cli/assets/images/social/commands.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://ragelink.github.io/porkbun-cli/commands/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="Porkbun CLI Command Reference - Porkbun CLI" >
+      
+        <meta  name="twitter:description"  content="Command-line interface for managing Porkbun domains and services" >
+      
+        <meta  name="twitter:image"  content="https://ragelink.github.io/porkbun-cli/assets/images/social/commands.png" >
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#porkbun-cli-command-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Porkbun CLI" class="md-header__button md-logo" aria-label="Porkbun CLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Porkbun CLI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Porkbun CLI Command Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ragelink/porkbun-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ragelink/porkbun-cli
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Porkbun CLI" class="md-nav__button md-logo" aria-label="Porkbun CLI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Porkbun CLI
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ragelink/porkbun-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ragelink/porkbun-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quick Start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/commands/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Commands
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../service_templates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Service Templates
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Workflows
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../domain_setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Domain Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Development
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/testing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-reference/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quick Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#global-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Options
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      config add
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      config list
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      config use
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config-remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      config remove
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Account Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Account Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#account-ping" class="md-nav__link">
+    <span class="md-ellipsis">
+      account ping
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#account-balance" class="md-nav__link">
+    <span class="md-ellipsis">
+      account balance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#account-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      account transactions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#account-portfolio-list-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      account portfolio list-domains
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#account-portfolio-tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      account portfolio tag
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#account-portfolio-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      account portfolio groups
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#account-portfolio-tags" class="md-nav__link">
+    <span class="md-ellipsis">
+      account portfolio tags
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domain-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Domain Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Domain Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domains-list-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      domains list-all
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domains-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      domains check
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domains-register" class="md-nav__link">
+    <span class="md-ellipsis">
+      domains register
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domains-bulk" class="md-nav__link">
+    <span class="md-ellipsis">
+      domains bulk
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domains-watch-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      domains watch-list
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domains-whois" class="md-nav__link">
+    <span class="md-ellipsis">
+      domains whois
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      DNS Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DNS Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dns-retrieve" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns retrieve
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-retrieve-records" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns retrieve-records
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-create-record" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns create-record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-update-record" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns update-record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-delete-record" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns delete-record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-batch-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns batch-update
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-batch-delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns batch-delete
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-dnssec-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns dnssec status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-dnssec-enable" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns dnssec enable
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dns-dnssec-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      dns dnssec disable
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ssl-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      SSL Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SSL Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ssl-retrieve" class="md-nav__link">
+    <span class="md-ellipsis">
+      ssl retrieve
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ssl-generate" class="md-nav__link">
+    <span class="md-ellipsis">
+      ssl generate
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#email-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Email Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Email Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#email-retrieve-forwards" class="md-nav__link">
+    <span class="md-ellipsis">
+      email retrieve-forwards
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-create-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      email create-forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-delete-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      email delete-forward
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automation-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automation Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automation Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automation-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      automation schedule
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automation-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      automation list
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automation-remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      automation remove
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitor-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitor Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Monitor Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitor-expiry" class="md-nav__link">
+    <span class="md-ellipsis">
+      monitor expiry
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitor-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      monitor dns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#url-forwarding-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      URL Forwarding Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="URL Forwarding Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url-list-forwards" class="md-nav__link">
+    <span class="md-ellipsis">
+      url list-forwards
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#url-add-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      url add-forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#url-delete-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      url delete-forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#url-batch-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      url batch-add
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#email-forwarding-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Email Forwarding Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Email Forwarding Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#email-list-forwards" class="md-nav__link">
+    <span class="md-ellipsis">
+      email list-forwards
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-create-forward_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      email create-forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-update-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      email update-forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-delete-forward_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      email delete-forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-batch-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      email batch-create
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-batch-delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      email batch-delete
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="porkbun-cli-command-reference">Porkbun CLI Command Reference<a class="headerlink" href="#porkbun-cli-command-reference" title="Permanent link">&para;</a></h1>
+<p>This document provides a comprehensive reference for all available commands in the Porkbun CLI tool.</p>
+<h2 id="global-options">Global Options<a class="headerlink" href="#global-options" title="Permanent link">&para;</a></h2>
+<p>These options can be used with any command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>--help          Show help message and exit
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>--profile TEXT  Specify the profile to use (overrides default)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>--verbose       Enable verbose output
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>--quiet         Suppress all output except errors
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>--json          Output in JSON format
+</code></pre></div>
+<h2 id="configuration-commands">Configuration Commands<a class="headerlink" href="#configuration-commands" title="Permanent link">&para;</a></h2>
+<h3 id="config-add">config add<a class="headerlink" href="#config-add" title="Permanent link">&para;</a></h3>
+<p>Add a new configuration profile.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>config<span class="w"> </span>add<span class="w"> </span>PROFILE<span class="w"> </span>--api-key<span class="w"> </span>KEY<span class="w"> </span>--secret-key<span class="w"> </span>SECRET<span class="w"> </span><span class="o">[</span>--make-default<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--api-key TEXT</code>: Your Porkbun API key [required]
+- <code>--secret-key TEXT</code>: Your Porkbun Secret API key [required]
+- <code>--make-default</code>: Set this profile as the default</p>
+<h3 id="config-list">config list<a class="headerlink" href="#config-list" title="Permanent link">&para;</a></h3>
+<p>List all configured profiles.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>config<span class="w"> </span>list
+</code></pre></div>
+<h3 id="config-use">config use<a class="headerlink" href="#config-use" title="Permanent link">&para;</a></h3>
+<p>Switch to a different profile.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>config<span class="w"> </span>use<span class="w"> </span>PROFILE
+</code></pre></div>
+<h3 id="config-remove">config remove<a class="headerlink" href="#config-remove" title="Permanent link">&para;</a></h3>
+<p>Remove a configuration profile.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>config<span class="w"> </span>remove<span class="w"> </span>PROFILE
+</code></pre></div>
+<h2 id="account-commands">Account Commands<a class="headerlink" href="#account-commands" title="Permanent link">&para;</a></h2>
+<h3 id="account-ping">account ping<a class="headerlink" href="#account-ping" title="Permanent link">&para;</a></h3>
+<p>Test API connectivity.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>account<span class="w"> </span>ping
+</code></pre></div>
+<h3 id="account-balance">account balance<a class="headerlink" href="#account-balance" title="Permanent link">&para;</a></h3>
+<p>Check account balance.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>account<span class="w"> </span>balance
+</code></pre></div>
+<h3 id="account-transactions">account transactions<a class="headerlink" href="#account-transactions" title="Permanent link">&para;</a></h3>
+<p>View transaction history.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>account<span class="w"> </span>transactions<span class="w"> </span><span class="o">[</span>--limit<span class="w"> </span>INTEGER<span class="o">]</span><span class="w"> </span><span class="o">[</span>--before<span class="w"> </span>DATE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--after<span class="w"> </span>DATE<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--limit INTEGER</code>: Maximum number of transactions to display
+- <code>--before DATE</code>: Show transactions before this date (YYYY-MM-DD)
+- <code>--after DATE</code>: Show transactions after this date (YYYY-MM-DD)</p>
+<h3 id="account-portfolio-list-domains">account portfolio list-domains<a class="headerlink" href="#account-portfolio-list-domains" title="Permanent link">&para;</a></h3>
+<p>List domains in your portfolio.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>account<span class="w"> </span>portfolio<span class="w"> </span>list-domains<span class="w"> </span><span class="o">[</span>--group<span class="w"> </span>TEXT<span class="o">]</span><span class="w"> </span><span class="o">[</span>--tag<span class="w"> </span>TEXT<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--group TEXT</code>: Filter by domain group
+- <code>--tag TEXT</code>: Filter by domain tag</p>
+<h3 id="account-portfolio-tag">account portfolio tag<a class="headerlink" href="#account-portfolio-tag" title="Permanent link">&para;</a></h3>
+<p>Tag a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>account<span class="w"> </span>portfolio<span class="w"> </span>tag<span class="w"> </span>DOMAIN<span class="w"> </span><span class="o">[</span>--group<span class="w"> </span>TEXT<span class="o">]</span><span class="w"> </span><span class="o">[</span>--tags<span class="w"> </span>TEXT<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--group TEXT</code>: Assign domain to a group
+- <code>--tags TEXT</code>: Assign tags to domain (comma-separated)</p>
+<h3 id="account-portfolio-groups">account portfolio groups<a class="headerlink" href="#account-portfolio-groups" title="Permanent link">&para;</a></h3>
+<p>List all domain groups.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>account<span class="w"> </span>portfolio<span class="w"> </span>groups
+</code></pre></div>
+<h3 id="account-portfolio-tags">account portfolio tags<a class="headerlink" href="#account-portfolio-tags" title="Permanent link">&para;</a></h3>
+<p>List all domain tags.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>account<span class="w"> </span>portfolio<span class="w"> </span>tags
+</code></pre></div>
+<h2 id="domain-commands">Domain Commands<a class="headerlink" href="#domain-commands" title="Permanent link">&para;</a></h2>
+<h3 id="domains-list-all">domains list-all<a class="headerlink" href="#domains-list-all" title="Permanent link">&para;</a></h3>
+<p>List all domains in your account.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>domains<span class="w"> </span>list-all<span class="w"> </span><span class="o">[</span>--sort-by<span class="w"> </span>FIELD<span class="o">]</span><span class="w"> </span><span class="o">[</span>--filter<span class="w"> </span>TEXT<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--sort-by FIELD</code>: Sort by field (domain, expiry, status)
+- <code>--filter TEXT</code>: Filter domains by text</p>
+<h3 id="domains-check">domains check<a class="headerlink" href="#domains-check" title="Permanent link">&para;</a></h3>
+<p>Check domain availability.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>domains<span class="w"> </span>check<span class="w"> </span>DOMAIN<span class="w"> </span><span class="o">[</span>--suggest<span class="o">]</span><span class="w"> </span><span class="o">[</span>--compare<span class="o">]</span><span class="w"> </span><span class="o">[</span>--watch<span class="w"> </span>PRICE<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--suggest</code>: Show domain suggestions
+- <code>--compare</code>: Compare prices across TLDs
+- <code>--watch PRICE</code>: Add domain to price watch list</p>
+<h3 id="domains-register">domains register<a class="headerlink" href="#domains-register" title="Permanent link">&para;</a></h3>
+<p>Register a new domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>domains<span class="w"> </span>register<span class="w"> </span>DOMAIN<span class="w"> </span><span class="o">[</span>--years<span class="w"> </span>INTEGER<span class="o">]</span><span class="w"> </span><span class="o">[</span>--whois-privacy<span class="o">]</span><span class="w"> </span><span class="o">[</span>--auto-renew<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--years INTEGER</code>: Registration period in years
+- <code>--whois-privacy</code>: Enable WHOIS privacy
+- <code>--auto-renew</code>: Enable auto-renewal</p>
+<h3 id="domains-bulk">domains bulk<a class="headerlink" href="#domains-bulk" title="Permanent link">&para;</a></h3>
+<p>Bulk register multiple domains.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>domains<span class="w"> </span>bulk<span class="w"> </span>DOMAIN...<span class="w"> </span><span class="o">[</span>--years<span class="w"> </span>INTEGER<span class="o">]</span><span class="w"> </span><span class="o">[</span>--whois-privacy<span class="o">]</span><span class="w"> </span><span class="o">[</span>--auto-renew<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- Same as <code>domains register</code></p>
+<h3 id="domains-watch-list">domains watch-list<a class="headerlink" href="#domains-watch-list" title="Permanent link">&para;</a></h3>
+<p>View domains in your price watch list.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>domains<span class="w"> </span>watch-list
+</code></pre></div>
+<h3 id="domains-whois">domains whois<a class="headerlink" href="#domains-whois" title="Permanent link">&para;</a></h3>
+<p>Check WHOIS information for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>domains<span class="w"> </span>whois<span class="w"> </span>DOMAIN
+</code></pre></div>
+<h2 id="dns-commands">DNS Commands<a class="headerlink" href="#dns-commands" title="Permanent link">&para;</a></h2>
+<h3 id="dns-retrieve">dns retrieve<a class="headerlink" href="#dns-retrieve" title="Permanent link">&para;</a></h3>
+<p>Retrieve DNS records for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>retrieve<span class="w"> </span>DOMAIN
+</code></pre></div>
+<h3 id="dns-retrieve-records">dns retrieve-records<a class="headerlink" href="#dns-retrieve-records" title="Permanent link">&para;</a></h3>
+<p>Retrieve all DNS records for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>retrieve-records<span class="w"> </span>DOMAIN
+</code></pre></div>
+<h3 id="dns-create-record">dns create-record<a class="headerlink" href="#dns-create-record" title="Permanent link">&para;</a></h3>
+<p>Create a new DNS record.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>create-record<span class="w"> </span>DOMAIN<span class="w"> </span>TYPE<span class="w"> </span>CONTENT<span class="w"> </span>TTL<span class="w"> </span><span class="o">[</span>--name<span class="w"> </span>NAME<span class="o">]</span><span class="w"> </span><span class="o">[</span>--priority<span class="w"> </span>PRIORITY<span class="o">]</span>
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>TYPE</code>: Record type (A, AAAA, CNAME, MX, TXT, etc.)
+- <code>CONTENT</code>: Record content
+- <code>TTL</code>: Time to live in seconds</p>
+<p><strong>Options:</strong>
+- <code>--name NAME</code>: Subdomain name (@ for root)
+- <code>--priority PRIORITY</code>: Priority (required for MX records)</p>
+<h3 id="dns-update-record">dns update-record<a class="headerlink" href="#dns-update-record" title="Permanent link">&para;</a></h3>
+<p>Update an existing DNS record.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>update-record<span class="w"> </span>DOMAIN<span class="w"> </span>RECORD_ID<span class="w"> </span><span class="o">[</span>--type<span class="w"> </span>TYPE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--content<span class="w"> </span>CONTENT<span class="o">]</span><span class="w"> </span><span class="o">[</span>--ttl<span class="w"> </span>TTL<span class="o">]</span><span class="w"> </span><span class="o">[</span>--name<span class="w"> </span>NAME<span class="o">]</span><span class="w"> </span><span class="o">[</span>--priority<span class="w"> </span>PRIORITY<span class="o">]</span>
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>RECORD_ID</code>: ID of the record to update</p>
+<p><strong>Options:</strong>
+- Same as <code>dns create-record</code> but all optional</p>
+<h3 id="dns-delete-record">dns delete-record<a class="headerlink" href="#dns-delete-record" title="Permanent link">&para;</a></h3>
+<p>Delete a DNS record.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>delete-record<span class="w"> </span>DOMAIN<span class="w"> </span>RECORD_ID
+</code></pre></div>
+<h3 id="dns-batch-update">dns batch-update<a class="headerlink" href="#dns-batch-update" title="Permanent link">&para;</a></h3>
+<p>Create or update multiple DNS records at once using a JSON file.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>batch-update<span class="w"> </span>DOMAIN<span class="w"> </span>BATCH_FILE
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>BATCH_FILE</code>: Path to JSON file containing DNS records</p>
+<p>The JSON file should contain an array of DNS record objects with the following fields:
+- <code>type</code>: Record type (A, AAAA, MX, CNAME, TXT, etc.)
+- <code>name</code>: Record name
+- <code>content</code>: Record content
+- <code>ttl</code>: Time to live (optional, defaults to 600)
+- <code>id</code>: Record ID (only needed for updating existing records)</p>
+<p>Example JSON file:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">[</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;192.0.2.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;ttl&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">600</span><span class="p">},</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CNAME&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;www&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;ttl&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">600</span><span class="p">}</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="p">]</span>
+</code></pre></div></p>
+<p><strong>Note on domain names</strong>: When specifying record names, be aware that the Porkbun API may append the domain to the record name. For example, a record name of <code>www</code> might be displayed as <code>www.example.com.example.com</code> in the API response.</p>
+<h3 id="dns-batch-delete">dns batch-delete<a class="headerlink" href="#dns-batch-delete" title="Permanent link">&para;</a></h3>
+<p>Delete multiple DNS records at once.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>batch-delete<span class="w"> </span>DOMAIN<span class="w"> </span>RECORD_IDS...
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>RECORD_IDS</code>: One or more record IDs to delete</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>batch-delete<span class="w"> </span>example.com<span class="w"> </span><span class="m">12345</span><span class="w"> </span><span class="m">67890</span><span class="w"> </span><span class="m">54321</span>
+</code></pre></div></p>
+<p>This will delete all the specified records and provide a summary of the operation.</p>
+<h3 id="dns-dnssec-status">dns dnssec status<a class="headerlink" href="#dns-dnssec-status" title="Permanent link">&para;</a></h3>
+<p>Check DNSSEC status.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>dnssec<span class="w"> </span>status<span class="w"> </span>DOMAIN
+</code></pre></div>
+<h3 id="dns-dnssec-enable">dns dnssec enable<a class="headerlink" href="#dns-dnssec-enable" title="Permanent link">&para;</a></h3>
+<p>Enable DNSSEC.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>dnssec<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>DOMAIN
+</code></pre></div>
+<h3 id="dns-dnssec-disable">dns dnssec disable<a class="headerlink" href="#dns-dnssec-disable" title="Permanent link">&para;</a></h3>
+<p>Disable DNSSEC.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>dns<span class="w"> </span>dnssec<span class="w"> </span>disable<span class="w"> </span>DOMAIN
+</code></pre></div>
+<h2 id="ssl-commands">SSL Commands<a class="headerlink" href="#ssl-commands" title="Permanent link">&para;</a></h2>
+<h3 id="ssl-retrieve">ssl retrieve<a class="headerlink" href="#ssl-retrieve" title="Permanent link">&para;</a></h3>
+<p>Retrieve SSL certificate for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>ssl<span class="w"> </span>retrieve<span class="w"> </span>DOMAIN<span class="w"> </span><span class="o">[</span>--output-dir<span class="w"> </span>DIRECTORY<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--output-dir DIRECTORY</code>: Directory to save certificate files</p>
+<h3 id="ssl-generate">ssl generate<a class="headerlink" href="#ssl-generate" title="Permanent link">&para;</a></h3>
+<p>Generate a new SSL certificate.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>ssl<span class="w"> </span>generate<span class="w"> </span>DOMAIN<span class="w"> </span><span class="o">[</span>--output-dir<span class="w"> </span>DIRECTORY<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--output-dir DIRECTORY</code>: Directory to save certificate files</p>
+<h2 id="email-commands">Email Commands<a class="headerlink" href="#email-commands" title="Permanent link">&para;</a></h2>
+<h3 id="email-retrieve-forwards">email retrieve-forwards<a class="headerlink" href="#email-retrieve-forwards" title="Permanent link">&para;</a></h3>
+<p>Retrieve email forwards for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>retrieve-forwards<span class="w"> </span>DOMAIN
+</code></pre></div>
+<h3 id="email-create-forward">email create-forward<a class="headerlink" href="#email-create-forward" title="Permanent link">&para;</a></h3>
+<p>Create a new email forward.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>create-forward<span class="w"> </span>DOMAIN<span class="w"> </span>EMAIL<span class="w"> </span>FORWARD_TO
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>EMAIL</code>: Email address to forward from
+- <code>FORWARD_TO</code>: Email address to forward to</p>
+<h3 id="email-delete-forward">email delete-forward<a class="headerlink" href="#email-delete-forward" title="Permanent link">&para;</a></h3>
+<p>Delete an email forward.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>delete-forward<span class="w"> </span>DOMAIN<span class="w"> </span>FORWARD_ID
+</code></pre></div>
+<h2 id="automation-commands">Automation Commands<a class="headerlink" href="#automation-commands" title="Permanent link">&para;</a></h2>
+<h3 id="automation-schedule">automation schedule<a class="headerlink" href="#automation-schedule" title="Permanent link">&para;</a></h3>
+<p>Schedule a command to run periodically.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>automation<span class="w"> </span>schedule<span class="w"> </span>NAME<span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>--interval<span class="w"> </span>INTERVAL<span class="o">]</span><span class="w"> </span><span class="o">[</span>--at<span class="w"> </span>TIME<span class="o">]</span>
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>NAME</code>: Unique name for the scheduled task
+- <code>COMMAND</code>: Command to execute</p>
+<p><strong>Options:</strong>
+- <code>--interval INTERVAL</code>: Interval (daily, weekly, monthly)
+- <code>--at TIME</code>: Time to run (HH:MM)</p>
+<h3 id="automation-list">automation list<a class="headerlink" href="#automation-list" title="Permanent link">&para;</a></h3>
+<p>List scheduled tasks.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>automation<span class="w"> </span>list
+</code></pre></div>
+<h3 id="automation-remove">automation remove<a class="headerlink" href="#automation-remove" title="Permanent link">&para;</a></h3>
+<p>Remove a scheduled task.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>automation<span class="w"> </span>remove<span class="w"> </span>NAME
+</code></pre></div>
+<h2 id="monitor-commands">Monitor Commands<a class="headerlink" href="#monitor-commands" title="Permanent link">&para;</a></h2>
+<h3 id="monitor-expiry">monitor expiry<a class="headerlink" href="#monitor-expiry" title="Permanent link">&para;</a></h3>
+<p>Monitor domain expiration.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>monitor<span class="w"> </span>expiry<span class="w"> </span><span class="o">[</span>--threshold<span class="w"> </span>DAYS<span class="o">]</span><span class="w"> </span><span class="o">[</span>--notification-email<span class="w"> </span>EMAIL<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--threshold DAYS</code>: Alert when domains are this many days from expiring
+- <code>--notification-email EMAIL</code>: Email to send notifications to</p>
+<h3 id="monitor-dns">monitor dns<a class="headerlink" href="#monitor-dns" title="Permanent link">&para;</a></h3>
+<p>Monitor DNS propagation.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>monitor<span class="w"> </span>dns<span class="w"> </span>DOMAIN<span class="w"> </span><span class="o">[</span>--record-type<span class="w"> </span>TYPE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--expected-value<span class="w"> </span>VALUE<span class="o">]</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--record-type TYPE</code>: DNS record type to monitor
+- <code>--expected-value VALUE</code>: Expected value for the record </p>
+<h2 id="url-forwarding-commands">URL Forwarding Commands<a class="headerlink" href="#url-forwarding-commands" title="Permanent link">&para;</a></h2>
+<h3 id="url-list-forwards">url list-forwards<a class="headerlink" href="#url-list-forwards" title="Permanent link">&para;</a></h3>
+<p>List URL forwards for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>url<span class="w"> </span>list-forwards<span class="w"> </span>DOMAIN
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name</p>
+<h3 id="url-add-forward">url add-forward<a class="headerlink" href="#url-add-forward" title="Permanent link">&para;</a></h3>
+<p>Add URL forward for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>url<span class="w"> </span>add-forward<span class="w"> </span>DOMAIN<span class="w"> </span>SOURCE<span class="w"> </span>DESTINATION<span class="w"> </span><span class="o">[</span>--type<span class="w"> </span>TYPE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--title<span class="w"> </span>TITLE<span class="o">]</span>
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>SOURCE</code>: Source path (e.g., 'blog' or '/' for root)
+- <code>DESTINATION</code>: Destination URL (e.g., '<a href="https://example.com/blog">https://example.com/blog</a>')</p>
+<p><strong>Options:</strong>
+- <code>--type TYPE</code>: Redirect type: 301 (permanent), 302 (temporary), or iframe. Default is 301.
+- <code>--title TITLE</code>: Title for iframe redirects</p>
+<h3 id="url-delete-forward">url delete-forward<a class="headerlink" href="#url-delete-forward" title="Permanent link">&para;</a></h3>
+<p>Delete URL forward for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>url<span class="w"> </span>delete-forward<span class="w"> </span>DOMAIN<span class="w"> </span>SOURCE
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>SOURCE</code>: Source path to delete (e.g., 'blog' or '/' for root)</p>
+<h3 id="url-batch-add">url batch-add<a class="headerlink" href="#url-batch-add" title="Permanent link">&para;</a></h3>
+<p>Add multiple URL forwards for a domain using a JSON file.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>url<span class="w"> </span>batch-add<span class="w"> </span>DOMAIN<span class="w"> </span>BATCH_FILE
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>BATCH_FILE</code>: Path to JSON file containing URL forward definitions</p>
+<p>The JSON file should contain an array of forwarding objects with the following fields:
+- <code>source</code>: Source path (e.g., 'blog' or '/' for root)
+- <code>destination</code>: Destination URL (e.g., '<a href="https://example.com/blog">https://example.com/blog</a>')
+- <code>type</code>: Redirect type ('301', '302', or 'iframe') - optional, defaults to '301'
+- <code>title</code>: Title for iframe redirects - optional</p>
+<p>Example JSON file:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="p">[</span>
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blog&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;destination&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://example.com/blog&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;301&quot;</span><span class="p">},</span>
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;shop&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;destination&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://shop.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;302&quot;</span><span class="p">}</span>
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="p">]</span>
+</code></pre></div></p>
+<h2 id="email-forwarding-commands">Email Forwarding Commands<a class="headerlink" href="#email-forwarding-commands" title="Permanent link">&para;</a></h2>
+<h3 id="email-list-forwards">email list-forwards<a class="headerlink" href="#email-list-forwards" title="Permanent link">&para;</a></h3>
+<p>List email forwards for a domain.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>list-forwards<span class="w"> </span>DOMAIN
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name</p>
+<h3 id="email-create-forward_1">email create-forward<a class="headerlink" href="#email-create-forward_1" title="Permanent link">&para;</a></h3>
+<p>Create an email forward.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>create-forward<span class="w"> </span>DOMAIN<span class="w"> </span>EMAIL_PREFIX<span class="w"> </span>FORWARD_TO
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>EMAIL_PREFIX</code>: Local part of the email (before @)
+- <code>FORWARD_TO</code>: Email address to forward to</p>
+<h3 id="email-update-forward">email update-forward<a class="headerlink" href="#email-update-forward" title="Permanent link">&para;</a></h3>
+<p>Update an email forward's destination.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>update-forward<span class="w"> </span>DOMAIN<span class="w"> </span>EMAIL_ID<span class="w"> </span>FORWARD_TO
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>EMAIL_ID</code>: ID of the email forward to update
+- <code>FORWARD_TO</code>: New email address to forward to</p>
+<h3 id="email-delete-forward_1">email delete-forward<a class="headerlink" href="#email-delete-forward_1" title="Permanent link">&para;</a></h3>
+<p>Delete an email forward.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>delete-forward<span class="w"> </span>DOMAIN<span class="w"> </span>EMAIL_ID
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>EMAIL_ID</code>: ID of the email forward to delete</p>
+<h3 id="email-batch-create">email batch-create<a class="headerlink" href="#email-batch-create" title="Permanent link">&para;</a></h3>
+<p>Create multiple email forwards for a domain using a JSON file.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>batch-create<span class="w"> </span>DOMAIN<span class="w"> </span>BATCH_FILE
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>BATCH_FILE</code>: Path to JSON file containing email forward definitions</p>
+<p>The JSON file should contain an array of forwarding objects with the following fields:
+- <code>email_prefix</code>: Local part of the email (before @)
+- <code>forward_to</code>: Email address to forward to</p>
+<p>Example JSON file:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="p">[</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;email_prefix&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;forward_to&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;contact@example.com&quot;</span><span class="p">},</span>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;email_prefix&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sales&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;forward_to&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sales@example.com&quot;</span><span class="p">}</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="p">]</span>
+</code></pre></div></p>
+<h3 id="email-batch-delete">email batch-delete<a class="headerlink" href="#email-batch-delete" title="Permanent link">&para;</a></h3>
+<p>Delete multiple email forwards at once.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>python<span class="w"> </span>-m<span class="w"> </span>porkbun.cli<span class="w"> </span>email<span class="w"> </span>batch-delete<span class="w"> </span>DOMAIN<span class="w"> </span>EMAIL_ID_1<span class="w"> </span><span class="o">[</span>EMAIL_ID_2<span class="w"> </span>...<span class="o">]</span>
+</code></pre></div>
+<p><strong>Arguments:</strong>
+- <code>DOMAIN</code>: Domain name
+- <code>EMAIL_ID_1 [EMAIL_ID_2 ...]</code>: One or more email forward IDs to delete </p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="March 15, 2025 22:56:16">March 15, 2025 22:56:16</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
