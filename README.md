@@ -266,6 +266,14 @@ The batch operations support JSON files with the following structure:
 ]
 ```
 
+## Why We Created This
+
+We love [Porkbun](https://porkbun.com/) and created this CLI tool to make it even easier to work with their excellent domain registration and management services. Porkbun's commitment to providing a robust API enables us to build tools that enhance the domain management experience. We encourage more companies in the domain and hosting space to follow Porkbun's example by offering comprehensive APIs, which will improve the ecosystem and empower the community to create innovative solutions.
+
+## Disclaimer
+
+This project was developed with the assistance of AI tools, including Claude. While we've made every effort to ensure the code is reliable and secure, users should exercise caution and use this software at their own risk. We recommend testing commands in a controlled environment before using them with production domains.
+
 ## DNS Batch Operations
 
 The CLI now supports batch operations for DNS records, allowing you to create, update, or delete multiple records in a single command.
@@ -378,4 +386,4 @@ For detailed documentation on domain setup with service templates, see [Domain S
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
