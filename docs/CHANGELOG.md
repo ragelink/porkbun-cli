@@ -5,10 +5,38 @@ All notable changes to the Porkbun CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2024-03-19
+
+### Added
+- Service templates for more providers:
+  - AWS Route 53
+  - GitHub Pages
+  - Vercel
+  - Shopify
+  - Digital Ocean
+  - Firebase
+- Enhanced template customization with extended placeholder support
+- Helper script (`setup_domain_services.py`) with support for all new templates
+- Service-specific command-line parameters for better customization
+- Comprehensive documentation for all new service templates
+- AI usage disclaimer
+- Porkbun appreciation statement
+
+### Changed
+- Improved template validation with placeholder skip logic
+- Enhanced documentation organization and structure
+- Updated GitHub Actions for better documentation builds
+- Streamlined package publishing workflow
+
+### Fixed
+- Template placeholder replacement consistency
+- Documentation build process
+- Minor bugs in template handling
+
 ## [0.2.0] - 2024-03-16
 
 ### Added
-- Service templates for domain setup (Cloudflare, Google Workspace, Office 365, Netlify, AWS, GitHub Pages, Vercel, Shopify, Digital Ocean, Firebase)
+- Service templates for domain setup (Cloudflare, Google Workspace, Office 365, Netlify)
 - Template customization script (`customize_template.py`)
 - Domain setup helper script (`setup_domain_services.py`)
 - Batch operations with YAML configuration

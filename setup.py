@@ -8,9 +8,9 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="porkbun-cli",
-    version="0.2.0",
+    version="0.3.0",
     author="ragelink",
-    author_email="ragelink@gmail.com",
+    author_email="ragelink@ragelink.com",
     description="A command-line interface for Porkbun domain management",
     long_description=long_description,
     long_description_content_type="text/markdown",
