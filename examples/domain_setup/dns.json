@@ -1,0 +1,33 @@
+[
+  {
+    "type": "A",
+    "name": "@",
+    "content": "192.0.2.1",
+    "ttl": 600
+  },
+  {
+    "type": "A",
+    "name": "www",
+    "content": "192.0.2.1",
+    "ttl": 600
+  },
+  {
+    "type": "CNAME",
+    "name": "blog",
+    "content": "example.com",
+    "ttl": 600
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mail.example.com",
+    "ttl": 600,
+    "priority": 10
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:_spf.example.com ~all",
+    "ttl": 600
+  }
+] 

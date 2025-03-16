@@ -1,0 +1,86 @@
+[
+  {
+    "type": "A",
+    "name": "@",
+    "content": "185.199.108.153",
+    "ttl": 3600
+  },
+  {
+    "type": "A",
+    "name": "@",
+    "content": "185.199.109.153",
+    "ttl": 3600
+  },
+  {
+    "type": "A",
+    "name": "@",
+    "content": "185.199.110.153",
+    "ttl": 3600
+  },
+  {
+    "type": "A",
+    "name": "@",
+    "content": "185.199.111.153",
+    "ttl": 3600
+  },
+  {
+    "type": "AAAA",
+    "name": "@",
+    "content": "2606:50c0:8000::153",
+    "ttl": 3600
+  },
+  {
+    "type": "AAAA",
+    "name": "@",
+    "content": "2606:50c0:8001::153",
+    "ttl": 3600
+  },
+  {
+    "type": "AAAA",
+    "name": "@",
+    "content": "2606:50c0:8002::153",
+    "ttl": 3600
+  },
+  {
+    "type": "AAAA",
+    "name": "@",
+    "content": "2606:50c0:8003::153",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "www",
+    "content": "example.github.io",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "docs",
+    "content": "example.github.io",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "blog",
+    "content": "example.github.io",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_github-pages-challenge-example",
+    "content": "REPLACE_WITH_YOUR_GITHUB_VERIFICATION_CODE",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:_spf.google.com ~all",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "ttl": 3600
+  }
+]

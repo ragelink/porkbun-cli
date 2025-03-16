@@ -1,0 +1,52 @@
+[
+  {
+    "type": "NS",
+    "name": "@",
+    "content": "jim.ns.cloudflare.com",
+    "ttl": 86400
+  },
+  {
+    "type": "NS",
+    "name": "@",
+    "content": "olivia.ns.cloudflare.com",
+    "ttl": 86400
+  },
+  {
+    "type": "A",
+    "name": "@",
+    "content": "192.0.2.1",
+    "ttl": 1
+  },
+  {
+    "type": "A",
+    "name": "www",
+    "content": "192.0.2.1",
+    "ttl": 1
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:_spf.mx.cloudflare.net ~all",
+    "ttl": 3600
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "amir.mx.cloudflare.net",
+    "ttl": 3600,
+    "priority": 49
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "linda.mx.cloudflare.net",
+    "ttl": 3600,
+    "priority": 8
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; rua=mailto:dmarc-reports@example.com",
+    "ttl": 3600
+  }
+] 

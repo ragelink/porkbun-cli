@@ -1,0 +1,42 @@
+[
+  {
+    "email_prefix": "info",
+    "forward_to": "main-contact@company.com"
+  },
+  {
+    "email_prefix": "sales",
+    "forward_to": "sales-team@company.com"
+  },
+  {
+    "email_prefix": "support",
+    "forward_to": "customer-support@company.com"
+  },
+  {
+    "email_prefix": "billing",
+    "forward_to": "accounts@company.com"
+  },
+  {
+    "email_prefix": "careers",
+    "forward_to": "hr@company.com"
+  },
+  {
+    "email_prefix": "webmaster",
+    "forward_to": "tech@company.com"
+  },
+  {
+    "email_prefix": "press",
+    "forward_to": "media@company.com"
+  },
+  {
+    "email_prefix": "legal",
+    "forward_to": "legal-dept@company.com"
+  },
+  {
+    "email_prefix": "privacy",
+    "forward_to": "legal-dept@company.com"
+  },
+  {
+    "email_prefix": "feedback",
+    "forward_to": "customer-support@company.com"
+  }
+] 

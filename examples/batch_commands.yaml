@@ -1,0 +1,17 @@
+- cmd: porkbun dns retrieve example.com
+  description: Retrieve DNS records for example.com
+
+- cmd: porkbun email list-forwards example.com
+  description: List email forwards for example.com
+
+- cmd: porkbun url list-forwards example.com
+  description: List URL forwards for example.com
+
+- cmd: porkbun dns create-record example.com A 192.0.2.1 600 --name www
+  description: Create an A record for www.example.com
+
+- cmd: porkbun email create-forward example.com info contact@example.com
+  description: Create an email forward from info@example.com to contact@example.com
+
+- cmd: porkbun url add-forward example.com blog https://blog.example.com --type 301
+  description: Create a URL forward from blog.example.com to https://blog.example.com 

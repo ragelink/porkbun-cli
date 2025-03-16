@@ -1,0 +1,38 @@
+# Batch file for setting up a domain with common services
+# Replace DOMAIN with your actual domain
+
+# Cloudflare Setup
+- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/cloudflare_dns.json
+  description: Set up Cloudflare DNS for DOMAIN
+
+# Google Workspace (GSuite) Setup  
+- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/google_workspace.json
+  description: Set up Google Workspace (GSuite) for DOMAIN
+
+# Microsoft Office 365 Setup
+- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/office365.json
+  description: Set up Microsoft Office 365 for DOMAIN
+
+# Netlify Setup
+- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/netlify.json
+  description: Set up Netlify for DOMAIN
+
+# AWS Route 53 Setup
+- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/aws_route53.json
+  description: Set up AWS services for DOMAIN
+
+# GitHub Pages Setup
+- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/github_pages.json
+  description: Set up GitHub Pages for DOMAIN
+
+# Vercel Setup
+- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/vercel.json
+  description: Set up Vercel for DOMAIN
+
+# Email Forwards Setup
+- cmd: porkbun email batch-create DOMAIN examples/business_forwards.json
+  description: Set up standard business email forwards for DOMAIN
+
+# URL Forwards Setup
+- cmd: porkbun url batch-add DOMAIN examples/url_forwards.json
+  description: Set up standard URL forwards for DOMAIN 

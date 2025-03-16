@@ -337,6 +337,42 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 7. Push to the branch (`git push origin feature/amazing-feature`)
 8. Open a Pull Request
 
+## Workflow Automation
+
+The CLI provides powerful workflow automation for common domain setup tasks:
+
+```bash
+# Set up a new domain with default DNS records
+python -m porkbun.cli workflow setup-domain example.com --dns-records dns_template.json
+
+# Run a batch file with multiple commands
+python -m porkbun.cli batch run services_setup.yaml --domain example.com
+```
+
+### Service Templates
+
+Included service templates make it easy to set up domains with popular services:
+
+- **Cloudflare DNS** - Basic DNS configuration for Cloudflare
+- **Google Workspace** - DNS configuration for Google Workspace (formerly G Suite)
+- **Microsoft Office 365** - DNS configuration for Microsoft Office 365
+- **Netlify** - DNS configuration for Netlify-hosted websites
+- **AWS Route 53** - DNS configuration for AWS services
+- **GitHub Pages** - DNS configuration for GitHub Pages
+- **Vercel** - DNS configuration for Vercel deployments
+
+Use the helper script to set up a domain with service templates:
+
+```bash
+# Set up a domain with Microsoft Office 365 DNS records
+python examples/setup_domain_services.py example.com --service microsoft
+
+# Set up a domain with all available service templates
+python examples/setup_domain_services.py example.com --service all --dry-run
+```
+
+For detailed documentation on domain setup with service templates, see [Domain Setup Guide](docs/domain_setup.md).
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

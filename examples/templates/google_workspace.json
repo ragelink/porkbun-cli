@@ -1,0 +1,85 @@
+[
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "aspmx.l.google.com",
+    "ttl": 3600,
+    "priority": 1
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "alt1.aspmx.l.google.com",
+    "ttl": 3600,
+    "priority": 5
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "alt2.aspmx.l.google.com",
+    "ttl": 3600,
+    "priority": 5
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "alt3.aspmx.l.google.com",
+    "ttl": 3600,
+    "priority": 10
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "alt4.aspmx.l.google.com",
+    "ttl": 3600,
+    "priority": 10
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:_spf.google.com ~all",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "mail",
+    "content": "ghs.googlehosted.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "calendar",
+    "content": "ghs.googlehosted.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "drive",
+    "content": "ghs.googlehosted.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "docs",
+    "content": "ghs.googlehosted.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "sites",
+    "content": "ghs.googlehosted.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "groups",
+    "content": "ghs.googlehosted.com",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; rua=mailto:dmarc-reports@EXAMPLE.COM",
+    "ttl": 3600
+  }
+] 

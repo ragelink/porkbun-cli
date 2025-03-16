@@ -1,0 +1,75 @@
+[
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "DOMAIN-com.mail.protection.outlook.com",
+    "ttl": 3600,
+    "priority": 0
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:spf.protection.outlook.com -all",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "autodiscover",
+    "content": "autodiscover.outlook.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "sip",
+    "content": "sipdir.online.lync.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "lyncdiscover",
+    "content": "webdir.online.lync.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "msoid",
+    "content": "clientconfig.microsoftonline-p.net",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "enterpriseregistration",
+    "content": "enterpriseregistration.windows.net",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "enterpriseenrollment",
+    "content": "enterpriseenrollment.manage.microsoft.com",
+    "ttl": 3600
+  },
+  {
+    "type": "SRV",
+    "name": "_sip._tls",
+    "content": "sipdir.online.lync.com",
+    "ttl": 3600,
+    "priority": 100,
+    "weight": 1,
+    "port": 443
+  },
+  {
+    "type": "SRV",
+    "name": "_sipfederationtls._tcp",
+    "content": "sipfed.online.lync.com",
+    "ttl": 3600,
+    "priority": 100,
+    "weight": 1,
+    "port": 5061
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc-reports@EXAMPLE.COM; ruf=mailto:dmarc-reports@EXAMPLE.COM; fo=1",
+    "ttl": 3600
+  }
+] 

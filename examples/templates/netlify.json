@@ -1,0 +1,76 @@
+[
+  {
+    "type": "A",
+    "name": "@",
+    "content": "75.2.60.5",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "www",
+    "content": "DOMAIN.netlify.app",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "blog",
+    "content": "DOMAIN.netlify.app",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "app",
+    "content": "DOMAIN.netlify.app",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:mailgun.org include:spf.netlify.com -all",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_netlify-site-verification",
+    "content": "REPLACE_WITH_YOUR_NETLIFY_VERIFICATION_CODE",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
+    "ttl": 3600
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mxa.mailgun.org",
+    "ttl": 3600,
+    "priority": 10
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mxb.mailgun.org",
+    "ttl": 3600,
+    "priority": 20
+  },
+  {
+    "type": "CNAME",
+    "name": "email",
+    "content": "mailgun.org",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "email",
+    "content": "REPLACE_WITH_YOUR_MAILGUN_VERIFICATION_CODE",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "_acme-challenge",
+    "content": "DOMAIN.acme.netlify.com",
+    "ttl": 3600
+  }
+] 

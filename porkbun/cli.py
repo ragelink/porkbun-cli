@@ -12,6 +12,8 @@ from porkbun.commands.monitor import monitor
 from porkbun.commands.automation import automation
 from porkbun.commands.url import url
 from porkbun.commands.email import email
+from porkbun.commands.workflow import workflow
+from porkbun.commands.batch import batch
 from porkbun.utils.logging import setup_logging, logger
 from porkbun.utils.config import ConfigManager
 
@@ -46,6 +48,8 @@ cli.add_command(monitor)
 cli.add_command(automation)
 cli.add_command(url)
 cli.add_command(email)
+cli.add_command(workflow)
+cli.add_command(batch)
 
 if __name__ == '__main__':
     cli()
