@@ -8,19 +8,19 @@
   {
     "type": "CNAME",
     "name": "www",
-    "content": "example-com.netlify.app",
+    "content": "DOMAIN.netlify.app",
     "ttl": 3600
   },
   {
     "type": "CNAME",
     "name": "blog",
-    "content": "example-com.netlify.app",
+    "content": "DOMAIN.netlify.app",
     "ttl": 3600
   },
   {
     "type": "CNAME",
     "name": "app",
-    "content": "example-com.netlify.app",
+    "content": "DOMAIN.netlify.app",
     "ttl": 3600
   },
   {
@@ -38,7 +38,7 @@
   {
     "type": "TXT",
     "name": "_dmarc",
-    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
     "ttl": 3600
   },
   {
@@ -70,7 +70,7 @@
   {
     "type": "CNAME",
     "name": "_acme-challenge",
-    "content": "example.com.acme.netlify.com",
+    "content": "DOMAIN.acme.netlify.com",
     "ttl": 3600
   }
-]
+] 

@@ -47,6 +47,29 @@ A powerful command-line interface tool for managing domains, DNS records, SSL ce
 
 You need to set up your Porkbun API credentials. The CLI supports multiple profiles.
 
+### API Credentials
+
+To use the Porkbun CLI, you need to provide your Porkbun API credentials. You can do this in several ways:
+
+1. Create a `.env` file in the root directory of the project (recommended for development):
+   ```
+   PORKBUN_API_KEY=your_api_key_here
+   PORKBUN_SECRET_API_KEY=your_secret_api_key_here
+   ```
+
+2. Set environment variables before running the CLI:
+   ```
+   export PORKBUN_API_KEY=your_api_key_here
+   export PORKBUN_SECRET_API_KEY=your_secret_api_key_here
+   ```
+
+3. Provide the credentials directly through the CLI:
+   ```
+   porkbun --api-key your_api_key_here --secret-api-key your_secret_api_key_here [command]
+   ```
+
+See the `.env.example` file for more configuration options.
+
 ### API Access Setup
 
 1. Log in to your Porkbun account

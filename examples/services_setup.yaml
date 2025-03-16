@@ -1,50 +1,51 @@
 # Batch file for setting up a domain with common services
 # Replace DOMAIN with your actual domain
 
-# Cloudflare Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/cloudflare_dns.json
-  description: Set up Cloudflare DNS for DOMAIN
-
-# Google Workspace (GSuite) Setup  
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/google_workspace.json
-  description: Set up Google Workspace (GSuite) for DOMAIN
-
-# Microsoft Office 365 Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/office365.json
-  description: Set up Microsoft Office 365 for DOMAIN
-
-# Netlify Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/netlify.json
-  description: Set up Netlify for DOMAIN
-
-# AWS Route 53 Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/aws_route53.json
-  description: Set up AWS services for DOMAIN
-
-# GitHub Pages Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/github_pages.json
-  description: Set up GitHub Pages for DOMAIN
-
-# Vercel Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/vercel.json
-  description: Set up Vercel for DOMAIN
-
-# Shopify Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/shopify.json
-  description: Set up Shopify for DOMAIN
-
-# Digital Ocean Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/digitalocean.json
-  description: Set up Digital Ocean for DOMAIN
-
-# Firebase Setup
-- cmd: porkbun workflow setup-domain DOMAIN --dns-records examples/templates/firebase.json
-  description: Set up Firebase for DOMAIN
-
-# Email Forwards Setup
-- cmd: porkbun email batch-create DOMAIN examples/business_forwards.json
-  description: Set up standard business email forwards for DOMAIN
-
-# URL Forwards Setup
-- cmd: porkbun url batch-add DOMAIN examples/url_forwards.json
-  description: Set up standard URL forwards for DOMAIN 
+commands:
+  - name: "Setup Cloudflare DNS"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/cloudflare_dns.json"
+    description: "Set up Cloudflare DNS for the domain"
+  
+  - name: "Setup Google Workspace"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/google_workspace.json"
+    description: "Set up Google Workspace for the domain"
+  
+  - name: "Setup Microsoft Office 365"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/office365.json"
+    description: "Set up Microsoft Office 365 for the domain"
+  
+  - name: "Setup Vercel"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/vercel.json"
+    description: "Set up Vercel for the domain"
+  
+  - name: "Setup GitHub Pages"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/github_pages.json"
+    description: "Set up GitHub Pages for the domain"
+  
+  - name: "Setup Netlify"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/netlify.json"
+    description: "Set up Netlify for the domain"
+  
+  - name: "Setup AWS Route 53"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/aws_route53.json"
+    description: "Set up AWS Route 53 for the domain"
+  
+  - name: "Setup Shopify"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/shopify.json"
+    description: "Set up Shopify for the domain"
+  
+  - name: "Setup Digital Ocean"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/digitalocean.json"
+    description: "Set up Digital Ocean for the domain"
+  
+  - name: "Setup Firebase"
+    command: "porkbun workflow setup-domain {domain} --template examples/templates/firebase.json"
+    description: "Set up Firebase for the domain"
+  
+  - name: "Setup Email Forwards"
+    command: "porkbun batch email-forwards create {domain} --file examples/configs/business_forwards.json"
+    description: "Create standard business email forwards"
+  
+  - name: "Setup URL Forwards"
+    command: "porkbun batch url-forwards add {domain} --file examples/configs/url_forwards.json"
+    description: "Add standard URL forwards" 

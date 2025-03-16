@@ -8,43 +8,43 @@
   {
     "type": "CNAME",
     "name": "www",
-    "content": "example.com.s3-website-us-west-2.amazonaws.com",
+    "content": "DOMAIN.s3-website-REGION.amazonaws.com",
     "ttl": 300
   },
   {
     "type": "CNAME",
     "name": "api",
-    "content": "example.com-api.execute-api.us-west-2.amazonaws.com",
+    "content": "DOMAIN-api.execute-api.REGION.amazonaws.com",
     "ttl": 300
   },
   {
     "type": "CNAME",
     "name": "static",
-    "content": "example.com.s3.amazonaws.com",
+    "content": "DOMAIN.s3.amazonaws.com",
     "ttl": 300
   },
   {
     "type": "CNAME",
     "name": "*.dev",
-    "content": "example-com-dev.cloudfront.net",
+    "content": "DOMAIN-dev.cloudfront.net",
     "ttl": 300
   },
   {
     "type": "CNAME",
     "name": "*.stage",
-    "content": "example-com-stage.cloudfront.net",
+    "content": "DOMAIN-stage.cloudfront.net",
     "ttl": 300
   },
   {
     "type": "CNAME",
     "name": "cdn",
-    "content": "example-com.cloudfront.net",
+    "content": "DOMAIN.cloudfront.net",
     "ttl": 300
   },
   {
     "type": "TXT",
     "name": "@",
-    "content": "v=spf1 include:amazonses.com include:_spfblog.example.com ~all",
+    "content": "v=spf1 include:amazonses.com include:_spfblog.DOMAIN ~all",
     "ttl": 300
   },
   {
@@ -56,20 +56,20 @@
   {
     "type": "TXT",
     "name": "_dmarc",
-    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
     "ttl": 300
   },
   {
     "type": "MX",
     "name": "@",
-    "content": "inbound-smtp.us-west-2.amazonaws.com",
+    "content": "inbound-smtp.REGION.amazonaws.com",
     "ttl": 300,
     "priority": 10
   },
   {
     "type": "CNAME",
     "name": "ses-verification",
-    "content": "_VERIFICATION_CNAME.us-west-2.amazonses.com",
+    "content": "_VERIFICATION_CNAME.REGION.amazonses.com",
     "ttl": 300
   }
-]
+] 

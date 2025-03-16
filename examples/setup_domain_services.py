@@ -13,6 +13,10 @@ import subprocess
 import json
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set up logging
 logging.basicConfig(
@@ -47,7 +51,7 @@ def verify_domain_format(domain):
     
     return True
 
-def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, region=None):
+def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, region=None, **kwargs):
     """Set up a domain with a specific service."""
     try:
         # Verify domain format
@@ -68,9 +72,13 @@ def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, r
             raise SetupError(f"Failed to create directory {output_dir}: {e}")
         
         # Define template paths
-        templates_dir = Path(__file__).parent / "templates"
+        template_dir = os.getenv("DEFAULT_TEMPLATE_DIR", "examples/templates")
+        templates_dir = Path(template_dir)
         if not templates_dir.exists():
-            raise SetupError(f"Templates directory not found: {templates_dir}")
+            # Try relative to script directory
+            templates_dir = Path(__file__).parent / "templates"
+            if not templates_dir.exists():
+                raise SetupError(f"Templates directory not found: {templates_dir}")
             
         template_paths = {
             "cloudflare": templates_dir / "cloudflare_dns.json",
@@ -98,8 +106,26 @@ def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, r
         # Customize template
         output_file = output_dir / f"{domain}_{service}_dns.json"
         
+        # Prepare additional template parameters
+        template_params = {}
+        
+        # Add service-specific parameters
+        if service == "aws" and region:
+            template_params["region"] = region
+        elif service == "digitalocean" and kwargs.get("droplet_ip"):
+            template_params["droplet_ip"] = kwargs.get("droplet_ip")
+        elif service == "firebase" and kwargs.get("firebase_app_id"):
+            template_params["app_id"] = kwargs.get("firebase_app_id")
+        elif service == "shopify" and kwargs.get("shopify_subdomain"):
+            template_params["subdomain"] = kwargs.get("shopify_subdomain")
+        
         try:
-            customized_template = customize_template(template_file, domain, output_file, region)
+            customized_template = customize_template(
+                template_file, 
+                domain, 
+                output_file, 
+                **template_params
+            )
         except (FileNotFoundError, TemplateError, ValueError) as e:
             logger.error(f"Template customization failed: {e}")
             return False
@@ -111,7 +137,7 @@ def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, r
         # Apply template using Porkbun CLI
         cmd = [
             "python", "-m", "porkbun.cli", "workflow", "setup-domain", 
-            domain, "--dns-records", str(customized_template)
+            domain, "--template", str(customized_template)
         ]
         
         logger.info(f"Running command: {' '.join(cmd)}")
@@ -147,8 +173,12 @@ def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, r
 def main():
     """Main entry point."""
     try:
+        # Get default domain from environment if available
+        default_domain = os.getenv("DEFAULT_DOMAIN", None)
+        
         parser = argparse.ArgumentParser(description="Set up domain with various service configurations")
-        parser.add_argument("domain", help="Domain to configure")
+        parser.add_argument("domain", nargs="?", default=default_domain, 
+                            help="Domain to configure (defaults to DEFAULT_DOMAIN in .env)")
         parser.add_argument("--service", 
                             choices=["cloudflare", "google", "microsoft", "netlify", "aws", 
                                      "github", "vercel", "shopify", "digitalocean", "firebase", "all"], 
@@ -162,10 +192,19 @@ def main():
         parser.add_argument("--shopify-subdomain", help="Shopify subdomain (if different from domain)")
         
         args = parser.parse_args()
+
+        # Check if domain is provided or in environment
+        if not args.domain:
+            logger.error("Domain must be provided as an argument or set as DEFAULT_DOMAIN in .env file")
+            sys.exit(1)
         
-        # Set logging level based on verbosity
+        # Set logging level based on verbosity or environment
+        log_level = os.getenv("LOG_LEVEL", "INFO")
         if args.verbose:
-            logging.getLogger().setLevel(logging.DEBUG)
+            log_level = "DEBUG"
+        
+        # Set log level from string
+        logging.getLogger().setLevel(getattr(logging, log_level))
             
         # Validate domain
         try:
@@ -184,7 +223,16 @@ def main():
         
         success_count = 0
         for service in services:
-            result = setup_domain_with_service(args.domain, service, args.output_dir, args.dry_run, args.region)
+            result = setup_domain_with_service(
+                args.domain, 
+                service, 
+                args.output_dir, 
+                args.dry_run, 
+                args.region,
+                droplet_ip=args.droplet_ip,
+                firebase_app_id=args.firebase_app_id,
+                shopify_subdomain=args.shopify_subdomain
+            )
             if result:
                 success_count += 1
                 

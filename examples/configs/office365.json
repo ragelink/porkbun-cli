@@ -2,7 +2,7 @@
   {
     "type": "MX",
     "name": "@",
-    "content": "example-com.mail.protection.outlook.com",
+    "content": "DOMAIN-com.mail.protection.outlook.com",
     "ttl": 3600,
     "priority": 0
   },
@@ -69,7 +69,7 @@
   {
     "type": "TXT",
     "name": "_dmarc",
-    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; ruf=mailto:dmarc@example.com; fo=1",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc-reports@EXAMPLE.COM; ruf=mailto:dmarc-reports@EXAMPLE.COM; fo=1",
     "ttl": 3600
   }
-]
+] 

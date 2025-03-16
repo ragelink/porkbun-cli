@@ -32,7 +32,7 @@
   {
     "type": "CNAME",
     "name": "shop",
-    "content": "example-com.myshopify.com",
+    "content": "SHOPIFY_SUBDOMAIN.myshopify.com",
     "ttl": 3600
   },
   {
@@ -50,7 +50,7 @@
   {
     "type": "TXT",
     "name": "_dmarc",
-    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
     "ttl": 3600
   },
   {
@@ -72,4 +72,4 @@
     "content": "shops.shopify.com",
     "ttl": 3600
   }
-]
+] 

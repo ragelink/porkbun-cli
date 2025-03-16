@@ -14,25 +14,25 @@
   {
     "type": "CNAME",
     "name": "www",
-    "content": "example-com.web.app",
+    "content": "FIREBASE_APP_ID.web.app",
     "ttl": 3600
   },
   {
     "type": "CNAME",
     "name": "app",
-    "content": "example-com.web.app",
+    "content": "FIREBASE_APP_ID.web.app",
     "ttl": 3600
   },
   {
     "type": "CNAME",
     "name": "api",
-    "content": "example-com.web.app",
+    "content": "FIREBASE_APP_ID.web.app",
     "ttl": 3600
   },
   {
     "type": "CNAME",
     "name": "*.firebaseapp",
-    "content": "example-com.web.app",
+    "content": "FIREBASE_APP_ID.web.app",
     "ttl": 3600
   },
   {
@@ -44,7 +44,7 @@
   {
     "type": "TXT",
     "name": "_dmarc",
-    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
     "ttl": 3600
   },
   {
@@ -80,4 +80,4 @@
     "ttl": 3600,
     "priority": 5
   }
-]
+] 

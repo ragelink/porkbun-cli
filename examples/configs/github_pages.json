@@ -50,24 +50,24 @@
   {
     "type": "CNAME",
     "name": "www",
-    "content": "example.github.io",
+    "content": "USERNAME.github.io",
     "ttl": 3600
   },
   {
     "type": "CNAME",
     "name": "docs",
-    "content": "example.github.io",
+    "content": "USERNAME.github.io",
     "ttl": 3600
   },
   {
     "type": "CNAME",
     "name": "blog",
-    "content": "example.github.io",
+    "content": "USERNAME.github.io",
     "ttl": 3600
   },
   {
     "type": "TXT",
-    "name": "_github-pages-challenge-example",
+    "name": "_github-pages-challenge-USERNAME",
     "content": "REPLACE_WITH_YOUR_GITHUB_VERIFICATION_CODE",
     "ttl": 3600
   },
@@ -80,7 +80,7 @@
   {
     "type": "TXT",
     "name": "_dmarc",
-    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
     "ttl": 3600
   }
-]
+] 

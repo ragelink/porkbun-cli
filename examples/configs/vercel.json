@@ -1,0 +1,76 @@
+[
+  {
+    "type": "A",
+    "name": "@",
+    "content": "76.76.21.21",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "www",
+    "content": "cname.vercel-dns.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "api",
+    "content": "cname.vercel-dns.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "app",
+    "content": "cname.vercel-dns.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "docs",
+    "content": "cname.vercel-dns.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "admin",
+    "content": "cname.vercel-dns.com",
+    "ttl": 3600
+  },
+  {
+    "type": "CNAME",
+    "name": "*.preview",
+    "content": "cname.vercel-dns.com",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "@",
+    "content": "v=spf1 include:_spf.google.com include:_spf.vercel-dns.com ~all",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_vercel",
+    "content": "REPLACE_WITH_YOUR_VERCEL_VERIFICATION_CODE",
+    "ttl": 3600
+  },
+  {
+    "type": "TXT",
+    "name": "_dmarc",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
+    "ttl": 3600
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mx1.vercel-dns.com",
+    "ttl": 3600,
+    "priority": 10
+  },
+  {
+    "type": "MX",
+    "name": "@",
+    "content": "mx2.vercel-dns.com", 
+    "ttl": 3600,
+    "priority": 20
+  }
+] 

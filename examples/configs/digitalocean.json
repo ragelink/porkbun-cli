@@ -2,49 +2,49 @@
   {
     "type": "A",
     "name": "@",
-    "content": "104.131.0.0",
+    "content": "DROPLET_IP",
     "ttl": 1800
   },
   {
     "type": "A",
     "name": "www",
-    "content": "104.131.0.0",
+    "content": "DROPLET_IP",
     "ttl": 1800
   },
   {
     "type": "CNAME",
     "name": "api",
-    "content": "example.com",
+    "content": "DOMAIN",
     "ttl": 1800
   },
   {
     "type": "CNAME",
     "name": "app",
-    "content": "example.com",
+    "content": "DOMAIN",
     "ttl": 1800
   },
   {
     "type": "CNAME",
     "name": "dev",
-    "content": "example.com",
+    "content": "DOMAIN",
     "ttl": 1800
   },
   {
     "type": "CNAME",
     "name": "staging",
-    "content": "example.com",
+    "content": "DOMAIN",
     "ttl": 1800
   },
   {
     "type": "CNAME",
     "name": "*.dev",
-    "content": "example.com",
+    "content": "DOMAIN",
     "ttl": 1800
   },
   {
     "type": "CNAME",
     "name": "*.staging",
-    "content": "example.com",
+    "content": "DOMAIN",
     "ttl": 1800
   },
   {
@@ -56,7 +56,7 @@
   {
     "type": "TXT",
     "name": "_dmarc",
-    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@example.com; fo=1",
+    "content": "v=DMARC1; p=none; pct=100; rua=mailto:dmarc@DOMAIN; fo=1",
     "ttl": 1800
   },
   {
@@ -85,4 +85,4 @@
     "content": "nyc3.digitaloceanspaces.com",
     "ttl": 1800
   }
-]
+] 
