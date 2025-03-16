@@ -42,7 +42,6 @@ plugins:
             show_source: true
   - git-revision-date-localized:
       type: datetime
-  - social
 
 markdown_extensions:
   - admonition
