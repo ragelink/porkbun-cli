@@ -40,7 +40,6 @@ jobs:
           pip install "mkdocs-material[imaging]"
           pip install mkdocstrings[python]
           pip install mkdocs-git-revision-date-localized-plugin
-          pip install mkdocs-social-plugin
 
       - name: Build documentation
         run: mkdocs build
