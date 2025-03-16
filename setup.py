@@ -1,10 +1,25 @@
 from setuptools import setup, find_packages
+import os
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
+# Define default requirements in case requirements.txt is not found
+default_requirements = [
+    "click>=8.0.0",
+    "requests>=2.25.0",
+    "tabulate>=0.8.0",
+    "pyyaml>=5.4.0",
+    "colorama>=0.4.4",
+    "cryptography>=3.4.0",
+    "jsonschema>=4.0.0"
+]
+
+# Try to read requirements from file, use default if file not found
+requirements = default_requirements
+if os.path.exists("requirements.txt"):
+    with open("requirements.txt", "r", encoding="utf-8") as fh:
+        requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
 
 setup(
     name="porkbun-cli",
