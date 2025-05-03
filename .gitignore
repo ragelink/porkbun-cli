@@ -10,6 +10,11 @@ __pycache__/
 creds*
 creds/**
 
+# Porkbun profile information (contains API keys)
+.porkbun/profiles/
+.porkbun/default_profile
+.porkbun/cache/
+
 # Distribution / packaging
 .Python
 build/
