@@ -2,7 +2,7 @@
 
 import pytest
 from click.testing import CliRunner
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from porkbun.commands.ssl import retrieve, generate, ssl
 from porkbun.utils.exceptions import PorkbunAPIError
@@ -46,38 +46,76 @@ def test_retrieve_error(runner):
 
 def test_generate_success(runner):
     """Test successful generation of SSL certificate"""
+    mock_retrieve_response = {"status": "ERROR", "message": "Certificate not found"}
     mock_generate_response = {
         "status": "SUCCESS",
         "certificatechain": ["-----BEGIN CERTIFICATE-----\n..."],
         "privatekey": "-----BEGIN PRIVATE KEY-----\n..."
     }
     
-    with patch('porkbun.commands.ssl.make_request') as mock_request:
-        mock_request.return_value = mock_generate_response
+    # Create a mock that returns different values based on the endpoint
+    def side_effect(endpoint, data=None):
+        if endpoint == 'ssl/retrieve/example.com':
+            return mock_retrieve_response
+        elif endpoint == 'ssl/generate/example.com':
+            return mock_generate_response
+        raise ValueError(f"Unexpected endpoint: {endpoint}")
+    
+    with patch('porkbun.commands.ssl.make_request', side_effect=side_effect) as mock_request:
         result = runner.invoke(ssl, ['generate', 'example.com'])
         assert result.exit_code == 0
-        mock_request.assert_called_with('ssl/generate/example.com', {})
+        # Verify both calls were made in the right order
+        assert mock_request.call_count == 2
+        assert mock_request.call_args_list[0][0][0] == 'ssl/retrieve/example.com'
+        assert mock_request.call_args_list[1][0][0] == 'ssl/generate/example.com'
+        assert mock_request.call_args_list[1][0][1] == {}
 
 def test_generate_validation_error(runner):
     """Test error handling when domain validation fails during generation"""
-    mock_response = {
+    # For the first retrieve call, return not found
+    mock_retrieve_response = {"status": "ERROR", "message": "Certificate not found"}
+    # For the generate call, return error
+    mock_generate_response = {
         "status": "ERROR",
         "message": "Domain validation failed"
     }
     
-    with patch('porkbun.commands.ssl.make_request', return_value=mock_response) as mock_request:
+    # Create a mock that returns different values based on the endpoint
+    def side_effect(endpoint, data=None):
+        if endpoint == 'ssl/retrieve/example.com':
+            return mock_retrieve_response
+        elif endpoint == 'ssl/generate/example.com':
+            return mock_generate_response
+        raise ValueError(f"Unexpected endpoint: {endpoint}")
+    
+    with patch('porkbun.commands.ssl.make_request', side_effect=side_effect) as mock_request:
         result = runner.invoke(ssl, ['generate', 'example.com'])
         assert result.exit_code == 0  # Command succeeds but shows error message
-        mock_request.assert_called_with('ssl/generate/example.com', {})
+        assert mock_request.call_count == 2
+        assert mock_request.call_args_list[0][0][0] == 'ssl/retrieve/example.com'
+        assert mock_request.call_args_list[1][0][0] == 'ssl/generate/example.com'
         assert "Error generating certificate" in result.output
 
 def test_generate_rate_limit(runner):
     """Test handling of rate limit errors during SSL certificate generation"""
-    with patch('porkbun.commands.ssl.make_request', side_effect=PorkbunAPIError("Rate limit exceeded")) as mock_request:
+    # For the first retrieve call, return not found
+    mock_retrieve_response = {"status": "ERROR", "message": "Certificate not found"}
+    
+    # Create a mock that returns different values or raises exceptions based on the endpoint
+    def side_effect(endpoint, data=None):
+        if endpoint == 'ssl/retrieve/example.com':
+            return mock_retrieve_response
+        elif endpoint == 'ssl/generate/example.com':
+            raise PorkbunAPIError("Rate limit exceeded")
+        raise ValueError(f"Unexpected endpoint: {endpoint}")
+    
+    with patch('porkbun.commands.ssl.make_request', side_effect=side_effect) as mock_request:
         result = runner.invoke(ssl, ['generate', 'example.com'])
         assert result.exit_code == 0  # Command succeeds but shows error message
-        mock_request.assert_called_with('ssl/generate/example.com', {})
+        assert mock_request.call_count == 2
+        assert mock_request.call_args_list[0][0][0] == 'ssl/retrieve/example.com'
         assert "Error generating certificate" in result.output
+        assert "Rate limit exceeded" in result.output
 
 def test_retrieve_invalid_domain(runner):
     """Test error handling for invalid domain format"""

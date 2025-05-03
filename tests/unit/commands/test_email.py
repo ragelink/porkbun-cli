@@ -3,7 +3,7 @@
 import pytest
 import json
 from click.testing import CliRunner
-from unittest.mock import patch, Mock
+from unittest.mock import patch, AsyncMock
 
 from porkbun.commands.email import (
     email,
@@ -18,12 +18,12 @@ from porkbun.utils.exceptions import PorkbunAPIError
 
 @pytest.fixture
 def runner():
-    """Create a Click CLI test runner."""
+    """Click CLI test runner."""
     return CliRunner()
 
 @pytest.fixture
 def mock_email_forwards():
-    """Sample email forwards response."""
+    """Mock email forwards response."""
     return {
         "status": "SUCCESS",
         "forwards": [
@@ -74,10 +74,10 @@ def sample_domain():
 class TestEmailCommands:
     """Test email forwarding commands."""
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_list_forwards(self, mock_run, runner, mock_email_forwards, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_list_forwards(self, mock_request, runner, mock_email_forwards, sample_domain):
         """Test listing email forwards."""
-        mock_run.return_value = mock_email_forwards
+        mock_request.return_value = mock_email_forwards
         
         result = runner.invoke(list_forwards, [sample_domain])
         
@@ -86,24 +86,24 @@ class TestEmailCommands:
         assert "info@example.com" in result.output
         assert "sales@example.com" in result.output
         
-        mock_run.assert_called_once_with(Mock())
+        mock_request.assert_called_once_with(f"email/retrieve/{sample_domain}", {})
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_list_forwards_empty(self, mock_run, runner, mock_empty_forwards, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_list_forwards_empty(self, mock_request, runner, mock_empty_forwards, sample_domain):
         """Test listing empty email forwards."""
-        mock_run.return_value = mock_empty_forwards
+        mock_request.return_value = mock_empty_forwards
         
         result = runner.invoke(list_forwards, [sample_domain])
         
         assert result.exit_code == 0
         assert "No email forwards found" in result.output
         
-        mock_run.assert_called_once_with(Mock())
+        mock_request.assert_called_once_with(f"email/retrieve/{sample_domain}", {})
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_create_forward(self, mock_run, runner, mock_success_response, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_create_forward(self, mock_request, runner, mock_success_response, sample_domain):
         """Test creating email forward."""
-        mock_run.return_value = mock_success_response
+        mock_request.return_value = mock_success_response
         
         result = runner.invoke(create_forward, [sample_domain, "info", "contact@example.com"])
         
@@ -112,22 +112,26 @@ class TestEmailCommands:
         assert "info@example.com" in result.output
         assert "contact@example.com" in result.output
         
-        mock_run.assert_called_once_with(Mock())
+        mock_request.assert_called_once_with("email/create", {
+            "domain": sample_domain,
+            "email": "info@example.com",
+            "forward_to": "contact@example.com"
+        })
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_create_forward_with_invalid_email(self, mock_run, runner, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_create_forward_with_invalid_email(self, mock_request, runner, sample_domain):
         """Test creating email forward with invalid email."""
         result = runner.invoke(create_forward, [sample_domain, "info", "invalid-email"])
         
         assert result.exit_code == 2
         assert "Invalid forwarding email address" in result.output
         
-        mock_run.assert_not_called()
+        mock_request.assert_not_called()
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_delete_forward(self, mock_run, runner, mock_success_response, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_delete_forward(self, mock_request, runner, mock_success_response, sample_domain):
         """Test deleting email forward."""
-        mock_run.return_value = mock_success_response
+        mock_request.return_value = mock_success_response
         
         result = runner.invoke(delete_forward, [sample_domain, "12345"])
         
@@ -135,13 +139,16 @@ class TestEmailCommands:
         assert "Successfully deleted email forward" in result.output
         assert "12345" in result.output
         
-        mock_run.assert_called_once_with(Mock())
+        mock_request.assert_called_once_with("email/delete", {
+            "domain": sample_domain,
+            "id": "12345"
+        })
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_update_forward_success(self, mock_run, runner, mock_email_forwards, mock_success_response, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_update_forward_success(self, mock_request, runner, mock_email_forwards, mock_success_response, sample_domain):
         """Test updating email forward."""
         # First call returns the list of forwards, second call is the update
-        mock_run.side_effect = [mock_email_forwards, mock_success_response]
+        mock_request.side_effect = [mock_email_forwards, mock_success_response]
         
         result = runner.invoke(update_forward, [sample_domain, "12345", "new@example.com"])
         
@@ -150,24 +157,35 @@ class TestEmailCommands:
         assert "info@example.com" in result.output
         assert "new@example.com" in result.output
         
-        assert mock_run.call_count == 2
+        assert mock_request.call_count == 2
+        # Check first call was retrieve
+        expected_first_call = f"email/retrieve/{sample_domain}"
+        assert mock_request.call_args_list[0][0][0] == expected_first_call
+        # Check second call was update with correct params
+        expected_second_call_params = {
+            "domain": sample_domain,
+            "id": "12345",
+            "email": "info@example.com",
+            "forward_to": "new@example.com"
+        }
+        assert mock_request.call_args_list[1][0][1] == expected_second_call_params
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_update_forward_not_found(self, mock_run, runner, mock_email_forwards, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_update_forward_not_found(self, mock_request, runner, mock_email_forwards, sample_domain):
         """Test updating non-existent email forward."""
-        mock_run.return_value = mock_email_forwards
+        mock_request.return_value = mock_email_forwards
         
         result = runner.invoke(update_forward, [sample_domain, "99999", "new@example.com"])
         
         assert result.exit_code == 1
         assert "not found" in result.output
         
-        mock_run.assert_called_once_with(Mock())
+        mock_request.assert_called_once_with(f"email/retrieve/{sample_domain}", {})
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_batch_create(self, mock_run, runner, mock_success_response, sample_domain, tmp_path):
+    @patch('porkbun.commands.email.make_request')
+    def test_batch_create(self, mock_request, runner, mock_success_response, sample_domain, tmp_path):
         """Test batch creating email forwards."""
-        mock_run.return_value = mock_success_response
+        mock_request.return_value = mock_success_response
         
         # Create test batch file
         batch_file = tmp_path / "email_forwards.json"
@@ -184,10 +202,17 @@ class TestEmailCommands:
         assert "Successfully created all" in result.output
         assert "2 email forwards" in result.output
         
-        assert mock_run.call_count == 2
+        assert mock_request.call_count == 2
+        # Check that requests had the expected parameters
+        first_call_params = {
+            "domain": sample_domain,
+            "email": "info@example.com",
+            "forward_to": "contact@example.com"
+        }
+        assert mock_request.call_args_list[0][0][1] == first_call_params
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_batch_create_invalid_json(self, mock_run, runner, sample_domain, tmp_path):
+    @patch('porkbun.commands.email.make_request')
+    def test_batch_create_invalid_json(self, mock_request, runner, sample_domain, tmp_path):
         """Test batch creating with invalid JSON."""
         # Create test batch file with invalid JSON
         batch_file = tmp_path / "invalid.json"
@@ -199,12 +224,12 @@ class TestEmailCommands:
         assert result.exit_code == 1
         assert "Invalid JSON" in result.output
         
-        mock_run.assert_not_called()
+        mock_request.assert_not_called()
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_batch_delete(self, mock_run, runner, mock_success_response, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_batch_delete(self, mock_request, runner, mock_success_response, sample_domain):
         """Test batch deleting email forwards."""
-        mock_run.return_value = mock_success_response
+        mock_request.return_value = mock_success_response
         
         result = runner.invoke(batch_delete, [sample_domain, "12345", "67890"])
         
@@ -212,22 +237,25 @@ class TestEmailCommands:
         assert "Successfully deleted all" in result.output
         assert "2 email forwards" in result.output
         
-        assert mock_run.call_count == 2
+        assert mock_request.call_count == 2
+        # Check that the endpoint was called with the right params
+        assert mock_request.call_args_list[0][0][1]["id"] == "12345"
+        assert mock_request.call_args_list[1][0][1]["id"] == "67890"
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_batch_delete_no_ids(self, mock_run, runner, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_batch_delete_no_ids(self, mock_request, runner, sample_domain):
         """Test batch deleting with no IDs provided."""
         result = runner.invoke(batch_delete, [sample_domain])
         
         assert result.exit_code == 1
         assert "No email IDs provided" in result.output
         
-        mock_run.assert_not_called()
+        mock_request.assert_not_called()
     
-    @patch('porkbun.commands.email.asyncio.run')
-    def test_error_handling(self, mock_run, runner, sample_domain):
+    @patch('porkbun.commands.email.make_request')
+    def test_error_handling(self, mock_request, runner, sample_domain):
         """Test API error handling."""
-        mock_run.side_effect = PorkbunAPIError("API error occurred")
+        mock_request.side_effect = PorkbunAPIError("API error occurred")
         
         result = runner.invoke(list_forwards, [sample_domain])
         

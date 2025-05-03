@@ -137,7 +137,7 @@ def setup_domain_with_service(domain, service, output_dir=None, dry_run=False, r
         # Apply template using Porkbun CLI
         cmd = [
             "python", "-m", "porkbun.cli", "workflow", "setup-domain", 
-            domain, "--template", str(customized_template)
+            domain, "--dns-records", str(customized_template)
         ]
         
         logger.info(f"Running command: {' '.join(cmd)}")
