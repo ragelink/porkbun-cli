@@ -6,5 +6,7 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . .
+# Install the package in development mode
+RUN pip install -e .
 
-ENTRYPOINT ["python", "porkbun/cli.py"]
+ENTRYPOINT ["python", "-m", "porkbun.cli"]

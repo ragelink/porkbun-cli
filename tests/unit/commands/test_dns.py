@@ -59,7 +59,7 @@ def test_retrieve_records_success(runner):
     with patch('porkbun.commands.dns.make_request', return_value=mock_response) as mock_request:
         result = runner.invoke(retrieve_records, ['example.com'])
         assert result.exit_code == 0
-        mock_request.assert_called_once_with('dns/retrieve', {'domain': 'example.com'})
+        mock_request.assert_called_once_with('dns/retrieve/example.com', {})
         assert str(mock_response) in result.output
 
 def test_update_record_success(runner):
@@ -95,10 +95,7 @@ def test_delete_record_success(runner):
     with patch('porkbun.commands.dns.make_request', return_value=mock_response) as mock_request:
         result = runner.invoke(delete_record, ['example.com', '123'])
         assert result.exit_code == 0
-        mock_request.assert_called_once_with('dns/delete', {
-            'domain': 'example.com',
-            'id': '123'
-        })
+        mock_request.assert_called_once_with('dns/delete/example.com/123', {})
         assert str(mock_response) in result.output
 
 def test_retrieve_error(runner):

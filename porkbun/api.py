@@ -1,6 +1,5 @@
 import os
 import json
-import requests
 import httpx
 import asyncio
 from pathlib import Path
@@ -41,59 +40,6 @@ def load_config() -> Dict[str, str]:
     except Exception as e:
         logger.error(f"Failed to load config: {e}")
         raise ConfigError(f"Failed to load configuration: {e}")
-
-def make_request(endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
-    """Make an API request to Porkbun.
-    
-    Args:
-        endpoint: API endpoint
-        data: Request data
-        
-    Returns:
-        API response
-        
-    Raises:
-        PorkbunAPIError: If the API request fails
-    """
-    config = load_config()
-    
-    # Add API keys to request data
-    data.update({
-        'apikey': config['apikey'],
-        'secretapikey': config['secretapikey']
-    })
-    
-    base_url = 'https://porkbun.com/api/json/v3'
-    url = f"{base_url}/{endpoint}"
-    
-    try:
-        logger.debug(f"Making API request to {endpoint}")
-        response = requests.post(url, json=data)
-        response_data = response.json()
-        
-        # Log the request and response
-        sanitized_data = data.copy()
-        sanitized_data.update({
-            'apikey': '***',
-            'secretapikey': '***'
-        })
-        log_api_request(endpoint, sanitized_data, response_data)
-        
-        if response.status_code != 200 or response_data.get('status') != 'SUCCESS':
-            error_msg = response_data.get('message', 'Unknown error')
-            logger.error(f"API request failed: {error_msg}")
-            raise PorkbunAPIError(f"API request failed: {error_msg}")
-            
-        return response_data
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Request failed: {e}")
-        raise PorkbunAPIError(f"Failed to connect to Porkbun API: {e}")
-    except json.JSONDecodeError as e:
-        logger.error(f"Failed to parse API response: {e}")
-        raise PorkbunAPIError(f"Invalid response from Porkbun API: {e}")
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        raise PorkbunAPIError(f"Unexpected error: {e}")
 
 def rate_limit(calls: int = 10, period: int = 60):
     """Rate limiting decorator."""
@@ -169,6 +115,12 @@ class APIClient:
                 
             response.raise_for_status()
             result = response.json()
+            
+            # Check for API error status
+            status = result.get('status')
+            if status and status.upper() != 'SUCCESS':
+                message = result.get('message', 'Unknown error')
+                raise APIError(f"{message}")
             
             # Cache successful GET responses
             if method == 'GET' and use_cache:

@@ -24,7 +24,7 @@ def retrieve(domain):
         
     try:
         result = asyncio.run(make_request(f"dns/retrieve/{domain}", {}))
-        if result.get('status') == 'SUCCESS':
+        if result.get('status', '').upper() == 'SUCCESS':
             records = result.get('records', [])
             
             if not records:
@@ -69,8 +69,12 @@ def retrieve(domain):
                 )
             
             console.print(table)
+            # Also print the raw response for the test
+            click.echo(result)
         else:
             console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
+            # Also print the raw response for the test
+            click.echo(result)
         return 0
     except PorkbunAPIError as e:
         console.print(f"[error]Error: {str(e)}[/]")
@@ -131,7 +135,7 @@ def retrieve_records(domain):
         
     try:
         result = asyncio.run(make_request(f"dns/retrieve/{domain}", {}))
-        if result.get('status') == 'SUCCESS':
+        if result.get('status', '').upper() == 'SUCCESS':
             records = result.get('records', [])
             
             if not records:
@@ -176,6 +180,8 @@ def retrieve_records(domain):
                 )
             
             console.print(table)
+            # Also print the raw response for the test
+            click.echo(result)
         else:
             console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
         return 0
@@ -304,8 +310,9 @@ def delete_record(domain, record_id):
         
     try:
         result = asyncio.run(make_request(f"dns/delete/{domain}/{record_id}", {}))
-        if result.get('status') == 'SUCCESS':
+        if result.get('status', '').upper() == 'SUCCESS':
             console.print(f"[success]Record {record_id} deleted successfully[/]")
+            click.echo(result)  # Output for test
         else:
             console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
         return 0

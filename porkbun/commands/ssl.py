@@ -1,5 +1,6 @@
 import click
 import time
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from rich.console import Console
@@ -27,7 +28,7 @@ def retrieve(domain: str, save_path: Optional[str]):
         raise click.BadParameter("Invalid domain format")
         
     try:
-        result = make_request(f"ssl/retrieve/{domain}", {})
+        result = asyncio.run(make_request(f"ssl/retrieve/{domain}", {}))
         if result.get('status') == 'SUCCESS':
             cert_data = result.get('certificatechain', [])
             if not cert_data:
@@ -87,7 +88,7 @@ def generate(domain: str, save_path: Optional[str], force: bool):
     try:
         # Check if certificate already exists
         if not force:
-            existing = make_request(f"ssl/retrieve/{domain}", {})
+            existing = asyncio.run(make_request(f"ssl/retrieve/{domain}", {}))
             if existing.get('status') == 'SUCCESS' and existing.get('certificatechain'):
                 console.print("[warning]Certificate already exists. Use --force to regenerate[/]")
                 return
@@ -101,7 +102,7 @@ def generate(domain: str, save_path: Optional[str], force: bool):
         ) as progress:
             task = progress.add_task("Generating certificate...", total=None)
             
-            result = make_request(f"ssl/generate/{domain}", {})
+            result = asyncio.run(make_request(f"ssl/generate/{domain}", {}))
             if result.get('status') == 'SUCCESS':
                 progress.update(task, description="Certificate generated successfully")
                 
@@ -133,7 +134,7 @@ def generate(domain: str, save_path: Optional[str], force: bool):
 def list_all():
     """List all SSL certificates."""
     try:
-        result = make_request("ssl/listAll", {})
+        result = asyncio.run(make_request("ssl/listAll", {}))
         if result.get('status') == 'SUCCESS':
             certs = result.get('certificates', [])
             if not certs:
@@ -169,7 +170,7 @@ def list_all():
 def expiring():
     """List certificates expiring soon."""
     try:
-        result = make_request("ssl/listAll", {})
+        result = asyncio.run(make_request("ssl/listAll", {}))
         if result.get('status') == 'SUCCESS':
             certs = result.get('certificates', [])
             if not certs:
