@@ -13,7 +13,7 @@ class Profile:
     name: str
     api_key: str
     secret_key: str
-    base_url: str = "https://porkbun.com/api/json/v3"
+    base_url: str = "https://api-ipv4.porkbun.com/api/json/v3"
     default: bool = False
 
 class ConfigManager:
@@ -76,7 +76,7 @@ class ConfigManager:
             name=profile_name,
             api_key=profile_data['api_key'],
             secret_key=profile_data['secret_key'],
-            base_url=profile_data.get('base_url', "https://porkbun.com/api/json/v3"),
+            base_url=profile_data.get('base_url', "https://api-ipv4.porkbun.com/api/json/v3"),
             default=profile_data.get('default', False)
         )
     
@@ -87,7 +87,7 @@ class ConfigManager:
                 name=name,
                 api_key=data['api_key'],
                 secret_key=data['secret_key'],
-                base_url=data.get('base_url', "https://porkbun.com/api/json/v3"),
+                base_url=data.get('base_url', "https://api-ipv4.porkbun.com/api/json/v3"),
                 default=data.get('default', False)
             )
             for name, data in self._config.get('profiles', {}).items()
@@ -103,7 +103,7 @@ class ConfigManager:
         profiles[name] = {
             'api_key': api_key,
             'secret_key': secret_key,
-            'base_url': base_url or "https://porkbun.com/api/json/v3",
+            'base_url': base_url or "https://api-ipv4.porkbun.com/api/json/v3",
             'default': make_default
         }
         
@@ -149,7 +149,7 @@ class ConfigManager:
             profiles[profile_name] = {
                 'api_key': env_api_key,
                 'secret_key': env_secret_key,
-                'base_url': env_base_url or "https://porkbun.com/api/json/v3",
+                'base_url': env_base_url or "https://api-ipv4.porkbun.com/api/json/v3",
                 'default': not profiles  # Make default if no other profiles exist
             }
     

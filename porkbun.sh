@@ -190,6 +190,7 @@ docker run --rm \
     -e RESET_CONFIG="$RESET_CONFIG" \
     -e PORKBUN_API_KEY="$API_KEY" \
     -e PORKBUN_SECRET_API_KEY="$SECRET_KEY" \
+    -e LOGURU_LEVEL="DEBUG" \
     --entrypoint="/entry.sh" \
     porkbun-cli "$@"
 

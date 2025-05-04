@@ -105,6 +105,12 @@ class APIClient:
             if data:
                 request_data.update(data)
             
+            # Debug request data
+            logger.debug(f"Making API request to {url}")
+            logger.debug(f"API Key: {profile.api_key[:8]}...")
+            logger.debug(f"Secret Key: {profile.secret_key[:8] if profile.secret_key else 'Not set'}...")
+            logger.debug(f"Full request data: {json.dumps(request_data)}")
+            
             # Make request
             response = await self.client.request(
                 method=method,
