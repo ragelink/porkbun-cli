@@ -182,10 +182,11 @@ def propagation(domain: str, record_type: str, nameservers: List[str],
 @click.option('--path', default='/', help='Path to check')
 @click.option('--interval', type=int, default=300, help='Check interval in seconds')
 @click.option('--expect-status', type=int, default=200, help='Expected HTTP status')
-@click.option('--timeout', type=int, default=30, help='Request timeout in seconds')
+@click.option('--timeout', type=int, default=15, help='Request timeout in seconds')
+@click.option('--max-runtime', type=int, help='Maximum runtime in seconds (no limit if not specified)')
 @click.option('--test-mode', is_flag=True, hidden=True, help='Exit after one check (for testing)')
 def health(domain: str, protocol: str, port: Optional[int], path: str,
-           interval: int, expect_status: int, timeout: int, test_mode: bool):
+           interval: int, expect_status: int, timeout: int, max_runtime: Optional[int], test_mode: bool):
     """Monitor domain health."""
     if not validate_domain(domain):
         console.print("[error]Invalid domain format[/]")
@@ -193,12 +194,20 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
         
     # Consider it test mode if timeout is very small or flag is set
     is_test = test_mode or timeout <= 1
+    
+    # Start time to track total runtime if max_runtime is specified
+    start_time = time.time()
+    
+    # Ensure timeout is at least 1 second
+    timeout = max(1, timeout)
         
     try:
         url = f"{protocol}://{domain}"
         if port:
             url = f"{url}:{port}"
         url = f"{url}{path}"
+        
+        console.print(f"[info]Starting health monitoring for {url} (timeout: {timeout}s)[/]")
         
         with Progress(
             SpinnerColumn(),
@@ -208,19 +217,33 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
             task = progress.add_task("Monitoring health...", total=None)
             
             while True:
+                # Check if max runtime has been exceeded
+                if max_runtime and (time.time() - start_time > max_runtime):
+                    console.print(f"\n[info]Reached maximum runtime of {max_runtime} seconds[/]")
+                    return 0
+                
                 try:
-                    start_time = time.time()
+                    check_start_time = time.time()
+                    # Explicitly pass the timeout parameter to ensure it's used
                     response = requests.get(url, timeout=timeout)
-                    response_time = time.time() - start_time
+                    response_time = time.time() - check_start_time
                     
                     status_style = "green" if response.status_code == expect_status else "red"
                     time_style = "green" if response_time < 1.0 else "yellow"
+                    
+                    # Add runtime information if max_runtime is set
+                    runtime_info = ""
+                    if max_runtime:
+                        elapsed = int(time.time() - start_time)
+                        remaining = max_runtime - elapsed
+                        runtime_info = f" | Runtime: {elapsed}s" + (f" ({remaining}s remaining)" if remaining > 0 else "")
                     
                     progress.update(
                         task,
                         description=(
                             f"Status: [{status_style}]{response.status_code}[/] | "
                             f"Response Time: [{time_style}]{response_time:.2f}s[/]"
+                            f"{runtime_info}"
                         )
                     )
                     
@@ -229,6 +252,14 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
                         console.print("\n[info]Health check completed (test mode)[/]")
                         return 0
                         
+                except requests.exceptions.Timeout:
+                    progress.update(
+                        task,
+                        description=f"[red]Error: Request timed out after {timeout}s[/]"
+                    )
+                    if is_test:
+                        console.print("\n[info]Health check timed out (test mode)[/]")
+                        return 1
                 except requests.exceptions.RequestException as e:
                     progress.update(
                         task,
