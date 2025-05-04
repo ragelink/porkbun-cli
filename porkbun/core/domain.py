@@ -7,6 +7,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 from ..utils.exceptions import PorkbunAPIError
+from ..utils.config import ConfigManager
 
 def format_domain(domain: str) -> str:
     """Format domain name by removing any internal periods except the TLD."""
@@ -53,7 +54,14 @@ def check_domain_availability(
         session = create_session()
         
     formatted_domain = format_domain(domain)
-    api_endpoint = f'https://api.porkbun.com/api/json/v3/domain/checkDomain/{formatted_domain}'
+    
+    # Get base URL from config
+    config_manager = ConfigManager()
+    config_manager.load()
+    profile = config_manager.get_profile()
+    base_url = profile.base_url.rstrip('/')
+    
+    api_endpoint = f'{base_url}/domain/checkDomain/{formatted_domain}'
     payload = {
         'apikey': api_key,
         'secretapikey': secret_key
