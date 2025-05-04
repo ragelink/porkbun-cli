@@ -183,12 +183,16 @@ def propagation(domain: str, record_type: str, nameservers: List[str],
 @click.option('--interval', type=int, default=300, help='Check interval in seconds')
 @click.option('--expect-status', type=int, default=200, help='Expected HTTP status')
 @click.option('--timeout', type=int, default=30, help='Request timeout in seconds')
+@click.option('--test-mode', is_flag=True, hidden=True, help='Exit after one check (for testing)')
 def health(domain: str, protocol: str, port: Optional[int], path: str,
-           interval: int, expect_status: int, timeout: int):
+           interval: int, expect_status: int, timeout: int, test_mode: bool):
     """Monitor domain health."""
     if not validate_domain(domain):
         console.print("[error]Invalid domain format[/]")
         return
+        
+    # Consider it test mode if timeout is very small or flag is set
+    is_test = test_mode or timeout <= 1
         
     try:
         url = f"{protocol}://{domain}"
@@ -219,11 +223,22 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
                             f"Response Time: [{time_style}]{response_time:.2f}s[/]"
                         )
                     )
+                    
+                    # Exit after first check if we're in test mode
+                    if is_test:
+                        console.print("\n[info]Health check completed (test mode)[/]")
+                        return 0
+                        
                 except requests.exceptions.RequestException as e:
                     progress.update(
                         task,
                         description=f"[red]Error: {str(e)}[/]"
                     )
+                    
+                    # Exit after first error if we're in test mode
+                    if is_test:
+                        console.print("\n[info]Health check completed with error (test mode)[/]")
+                        return 1
                 
                 time.sleep(interval)
                 

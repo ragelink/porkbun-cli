@@ -84,12 +84,11 @@ def export_results(results: List[dict], format: str, output: str) -> None:
 def get_tld_pricing() -> Dict:
     """Get pricing for all TLDs."""
     try:
-        data = make_request("pricing/get", {})
-        if data.get('status') == 'SUCCESS':
-            return data.get('pricing', {})
+        result = asyncio.run(make_request("pricing/get", {}))
+        return result.get('pricing', {})
     except Exception as e:
-        console.print(f"[warning]Could not fetch TLD pricing: {e}[/]")
-    return {}
+        console.print(f"[error]Could not fetch TLD pricing: {str(e)}[/]")
+        return {}
 
 def suggest_domains(base_domain: str, tld_pricing: Dict) -> List[Dict]:
     """Suggest alternative domain names based on available TLDs."""
@@ -100,7 +99,7 @@ def suggest_domains(base_domain: str, tld_pricing: Dict) -> List[Dict]:
         if isinstance(pricing, dict):  # Some responses might be malformed
             suggested_domain = f"{name}.{tld}"
             try:
-                data = make_request(f"domain/checkDomain/{suggested_domain}", {})
+                data = asyncio.run(make_request(f"domain/checkDomain/{suggested_domain}", {}))
                 if data.get('status') == 'SUCCESS' and data.get('response', {}).get('avail') == 'yes':
                     suggestions.append({
                         'domain': suggested_domain,
@@ -297,7 +296,7 @@ def check(domain: str, suggest: bool, compare: bool, watch: Optional[float],
         tld_pricing = get_tld_pricing() if (suggest or compare) else {}
         
         # Check domain availability
-        result = make_request(f"domain/checkDomain/{domain}", {})
+        result = asyncio.run(make_request(f"domain/checkDomain/{domain}", {}))
         check_result = {
             'domain': domain,
             'success': result.get('status') == 'SUCCESS',
@@ -348,7 +347,7 @@ def check(domain: str, suggest: bool, compare: bool, watch: Optional[float],
 def create(domain, password):
     """Create a new domain"""
     data = {"domain": domain, "password": password}
-    result = make_request("domain/create", data)
+    result = asyncio.run(make_request("domain/create", data))
     click.echo(result)
 
 # Delete a domain
@@ -357,7 +356,7 @@ def create(domain, password):
 def delete(domain):
     """Delete a domain"""
     data = {"domain": domain}
-    result = make_request("domain/delete", data)
+    result = asyncio.run(make_request("domain/delete", data))
     click.echo(result)
 
 # Update name servers for a domain
@@ -367,7 +366,7 @@ def delete(domain):
 def update_name_servers(domain, nameservers):
     """Update name servers for a domain"""
     data = {"domain": domain, "nameservers": list(nameservers)}
-    result = make_request("domain/updateNameServers", data)
+    result = asyncio.run(make_request("domain/updateNameServers", data))
     click.echo(result)
 
 # Retrieve name servers for a domain
@@ -376,7 +375,7 @@ def update_name_servers(domain, nameservers):
 def retrieve_name_servers(domain):
     """Retrieve name servers for a domain"""
     data = {"domain": domain}
-    result = make_request("domain/retrieveNameServers", data)
+    result = asyncio.run(make_request("domain/retrieveNameServers", data))
     click.echo(result)
 
 # List contacts for a domain
@@ -385,7 +384,7 @@ def retrieve_name_servers(domain):
 def list_contacts(domain):
     """List domain contacts"""
     data = {"domain": domain}
-    result = make_request("domain/listContacts", data)
+    result = asyncio.run(make_request("domain/listContacts", data))
     click.echo(result)
 
 # Update contacts for a domain
@@ -395,7 +394,7 @@ def list_contacts(domain):
 def update_contacts(domain, contacts):
     """Update domain contacts"""
     data = {"domain": domain, "contacts": list(contacts)}
-    result = make_request("domain/updateContacts", data)
+    result = asyncio.run(make_request("domain/updateContacts", data))
     click.echo(result)
 
 @dns.command()
@@ -403,7 +402,7 @@ def update_contacts(domain, contacts):
 def list_records(domain: str):
     """List all DNS records for a domain"""
     try:
-        result = make_request(f"dns/retrieve/{domain}", {})
+        result = asyncio.run(make_request(f"dns/retrieve/{domain}", {}))
         if result.get('status') == 'SUCCESS':
             records = result.get('records', [])
             
@@ -445,7 +444,7 @@ def create_record(domain: str, type: str, name: str, content: str, ttl: int):
     }
     
     try:
-        result = make_request(f"dns/create/{domain}", data)
+        result = asyncio.run(make_request(f"dns/create/{domain}", data))
         if result.get('status') == 'SUCCESS':
             console.print(f"[success]Successfully created {type} record for {name}[/]")
         else:
@@ -459,7 +458,7 @@ def create_record(domain: str, type: str, name: str, content: str, ttl: int):
 def delete_record(domain: str, record_id: str):
     """Delete a DNS record"""
     try:
-        result = make_request(f"dns/delete/{domain}/{record_id}", {})
+        result = asyncio.run(make_request(f"dns/delete/{domain}/{record_id}", {}))
         if result.get('status') == 'SUCCESS':
             console.print(f"[success]Successfully deleted record {record_id}[/]")
         else:
@@ -479,7 +478,7 @@ def edit_record(domain: str, record_id: str, type: Optional[str], name: Optional
     """Edit a DNS record"""
     # First get the existing record
     try:
-        current = make_request(f"dns/retrieve/{domain}", {})
+        current = asyncio.run(make_request(f"dns/retrieve/{domain}", {}))
         if current.get('status') != 'SUCCESS':
             console.print(f"[error]Error retrieving current record: {current.get('message', 'Unknown error')}[/]")
             return
@@ -497,7 +496,7 @@ def edit_record(domain: str, record_id: str, type: Optional[str], name: Optional
             "ttl": ttl if ttl is not None else record.get('ttl', 600)
         }
         
-        result = make_request(f"dns/edit/{domain}/{record_id}", data)
+        result = asyncio.run(make_request(f"dns/edit/{domain}/{record_id}", data))
         if result.get('status') == 'SUCCESS':
             console.print(f"[success]Successfully updated record {record_id}[/]")
         else:
@@ -536,7 +535,7 @@ def bulk(domains: tuple, file: Optional[str], years: int, nameservers: tuple,
         for domain in domain_list:
             progress.update(task, description=f"Checking {domain}")
             try:
-                data = make_request(f"domain/checkDomain/{domain}", {})
+                data = asyncio.run(make_request(f"domain/checkDomain/{domain}", {}))
                 if data.get('status') == 'SUCCESS':
                     if data.get('response', {}).get('avail') == 'yes':
                         price = float(data.get('response', {}).get('price', 0))
@@ -602,7 +601,7 @@ def bulk(domains: tuple, file: Optional[str], years: int, nameservers: tuple,
                 if nameservers:
                     data["ns"] = list(nameservers)
                 
-                result = make_request(f"domain/register/{domain}", data)
+                result = asyncio.run(make_request(f"domain/register/{domain}", data))
                 if result.get('status') == 'SUCCESS':
                     console.print(f"[success]Successfully registered {domain}[/]")
                 else:
@@ -642,7 +641,7 @@ def bulk(domains: tuple, file: Optional[str], auth_code: str,
         for domain in domain_list:
             progress.update(task, description=f"Checking {domain}")
             try:
-                data = make_request(f"domain/transferCheck/{domain}", {})
+                data = asyncio.run(make_request(f"domain/transferCheck/{domain}", {}))
                 if data.get('status') == 'SUCCESS':
                     price = float(data.get('response', {}).get('price', 0))
                     eligible_domains.append((domain, price))
@@ -693,7 +692,7 @@ def bulk(domains: tuple, file: Optional[str], auth_code: str,
                     "whoisPrivacy": whois_privacy
                 }
                 
-                result = make_request(f"domain/transfer/{domain}", data)
+                result = asyncio.run(make_request(f"domain/transfer/{domain}", data))
                 if result.get('status') == 'SUCCESS':
                     console.print(f"[success]Successfully initiated transfer for {domain}[/]")
                 else:
@@ -707,7 +706,7 @@ def bulk(domains: tuple, file: Optional[str], auth_code: str,
 def status():
     """Check status of pending transfers."""
     try:
-        result = make_request("domain/transferList", {})
+        result = asyncio.run(make_request("domain/transferList", {}))
         if not result.get('transfers'):
             console.print("[info]No pending transfers[/]")
             return
@@ -735,7 +734,7 @@ def status():
 def retrieve(domain: str):
     """Retrieve SSL certificate details"""
     try:
-        result = make_request(f"ssl/retrieve/{domain}", {})
+        result = asyncio.run(make_request(f"ssl/retrieve/{domain}", {}))
         if result.get('status') == 'SUCCESS':
             cert_data = result.get('certificateDetails', {})
             
@@ -771,7 +770,7 @@ def retrieve(domain: str):
 def generate(domain: str):
     """Generate a new SSL certificate"""
     try:
-        result = make_request(f"ssl/generate/{domain}", {})
+        result = asyncio.run(make_request(f"ssl/generate/{domain}", {}))
         if result.get('status') == 'SUCCESS':
             console.print(f"[success]Successfully generated SSL certificate for {domain}[/]")
             # Show the certificate details
@@ -785,7 +784,7 @@ def generate(domain: str):
 def balance():
     """Check account balance"""
     try:
-        result = make_request("balance", {})
+        result = asyncio.run(make_request("balance", {}))
         if result.get('status') == 'SUCCESS':
             balance = result.get('balance', 0)
             console.print(f"Current balance: [green]${balance:.2f}[/]")
@@ -799,7 +798,7 @@ def balance():
 def transactions(limit: int):
     """View recent transactions"""
     try:
-        result = make_request("transactions", {"limit": limit})
+        result = asyncio.run(make_request("transactions", {"limit": limit}))
         if result.get('status') == 'SUCCESS':
             transactions = result.get('transactions', [])
             
@@ -835,7 +834,7 @@ def transactions(limit: int):
 def whois(domain: str):
     """Get WHOIS information for a domain"""
     try:
-        result = make_request(f"whois/{domain}", {})
+        result = asyncio.run(make_request(f"whois/{domain}", {}))
         if result.get('status') == 'SUCCESS':
             whois_data = result.get('whois', {})
             
@@ -864,7 +863,7 @@ def privacy(domain: str, enable: bool):
     """Manage WHOIS privacy for a domain"""
     try:
         endpoint = "enableWhoisPrivacy" if enable else "disableWhoisPrivacy"
-        result = make_request(f"domain/{endpoint}/{domain}", {})
+        result = asyncio.run(make_request(f"domain/{endpoint}/{domain}", {}))
         if result.get('status') == 'SUCCESS':
             status = "enabled" if enable else "disabled"
             console.print(f"[success]Successfully {status} WHOIS privacy for {domain}[/]")
@@ -896,7 +895,7 @@ def watch_list():
 
     for domain, info in watch_list.items():
         try:
-            data = make_request(f"domain/checkDomain/{domain}", {})
+            data = asyncio.run(make_request(f"domain/checkDomain/{domain}", {}))
             current_price = data.get('response', {}).get('price', 'N/A')
             available = data.get('response', {}).get('avail') == 'yes'
             
@@ -950,7 +949,7 @@ def bulk(domains: tuple, file: Optional[str], years: int, force: bool):
         for domain in domain_list:
             progress.update(task, description=f"Checking {domain}")
             try:
-                result = make_request(f"domain/getRenewalPrice/{domain}", {})
+                result = asyncio.run(make_request(f"domain/getRenewalPrice/{domain}", {}))
                 if result.get('status') == 'SUCCESS':
                     price = float(result.get('renewalPrice', 0))
                     expiry = result.get('expirationDate', 'Unknown')
@@ -1008,10 +1007,10 @@ def bulk(domains: tuple, file: Optional[str], years: int, force: bool):
         for renewal in renewals:
             progress.update(task, description=f"Renewing {renewal['domain']}")
             try:
-                result = make_request("domain/renew", {
+                result = asyncio.run(make_request("domain/renew", {
                     "domain": renewal['domain'],
                     "years": renewal['years']
-                })
+                }))
                 if result.get('status') == 'SUCCESS':
                     console.print(f"[success]Successfully renewed {renewal['domain']} for {renewal['years']} years[/]")
                 else:
@@ -1025,7 +1024,7 @@ def bulk(domains: tuple, file: Optional[str], years: int, force: bool):
 def auto():
     """Manage auto-renewal settings."""
     try:
-        result = make_request("domain/listAll", {})
+        result = asyncio.run(make_request("domain/listAll", {}))
         if not result.get('domains'):
             console.print("[info]No domains found[/]")
             return
@@ -1039,7 +1038,7 @@ def auto():
         for domain in result['domains']:
             domain_name = domain['domain']
             try:
-                info = make_request(f"domain/getRenewalPrice/{domain_name}", {})
+                info = asyncio.run(make_request(f"domain/getRenewalPrice/{domain_name}", {}))
                 auto_renewal = "[green]Enabled[/]" if domain.get('autoRenew') else "[red]Disabled[/]"
                 expiry = info.get('expirationDate', 'Unknown')
                 price = f"${float(info.get('renewalPrice', 0)):.2f}"
@@ -1069,7 +1068,7 @@ def auto():
 def set_auto(domain: str, enable: bool):
     """Enable or disable auto-renewal for a domain."""
     try:
-        result = make_request(f"domain/setAutoRenew/{domain}", {"autoRenew": enable})
+        result = asyncio.run(make_request(f"domain/setAutoRenew/{domain}", {"autoRenew": enable}))
         if result.get('status') == 'SUCCESS':
             status = "enabled" if enable else "disabled"
             console.print(f"[success]Successfully {status} auto-renewal for {domain}[/]")
@@ -1082,7 +1081,7 @@ def set_auto(domain: str, enable: bool):
 def expiring():
     """List domains expiring soon."""
     try:
-        result = make_request("domain/listAll", {})
+        result = asyncio.run(make_request("domain/listAll", {}))
         if not result.get('domains'):
             console.print("[info]No domains found[/]")
             return
@@ -1104,7 +1103,7 @@ def expiring():
                 domain_name = domain['domain']
                 progress.update(task, description=f"Checking {domain_name}")
                 try:
-                    info = make_request(f"domain/getRenewalPrice/{domain_name}", {})
+                    info = asyncio.run(make_request(f"domain/getRenewalPrice/{domain_name}", {}))
                     expiry_date = info.get('expirationDate')
                     if expiry_date:
                         expiry_time = time.mktime(time.strptime(expiry_date, "%Y-%m-%d"))
