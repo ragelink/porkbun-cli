@@ -97,10 +97,13 @@ class APIClient:
                     
             # Prepare request data
             request_data = {
-                'apikey': profile.api_key,
                 'secretapikey': profile.secret_key,
-                **(data or {})
+                'apikey': profile.api_key
             }
+            
+            # Add any additional data
+            if data:
+                request_data.update(data)
             
             # Make request
             response = await self.client.request(
@@ -130,6 +133,19 @@ class APIClient:
             
         except httpx.HTTPStatusError as e:
             logger.error(f"HTTP error: {e.response.status_code} - {e.response.text}")
+            
+            # Handle 403 Forbidden errors with specific guidance
+            if e.response.status_code == 403:
+                error_message = (
+                    f"Access Forbidden (403). This could be due to:\n"
+                    f"1. Invalid API keys - verify your API keys are correct\n"
+                    f"2. IP restriction - your current IP address may not be allowed in the Porkbun API settings\n"
+                    f"3. API access not enabled - make sure API access is enabled in your Porkbun account\n"
+                    f"4. Using an outdated API version - the V3 Beta API might require updated credentials\n\n"
+                    f"Please check your credentials and account settings at https://porkbun.com/account/api"
+                )
+                raise APIError(error_message)
+            
             # Check for specific error message about domain not opted in to API access
             error_text = e.response.text.lower()
             if "domain is not opted in to api access" in error_text:

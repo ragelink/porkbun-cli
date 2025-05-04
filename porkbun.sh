@@ -182,6 +182,7 @@ echo -e "${YELLOW}2. Your IP address is allowed in the Porkbun API settings${NC}
 echo -e "${YELLOW}3. The API is enabled for each domain you're trying to manage${NC}"
 
 docker run --rm \
+    -it \
     -v "$(pwd):/app" \
     -v "$VOLUME_NAME:/root/.porkbun" \
     -v "$ENTRY_SCRIPT:/entry.sh" \

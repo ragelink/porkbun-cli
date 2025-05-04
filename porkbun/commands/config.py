@@ -138,4 +138,27 @@ def validate():
     except ConfigError as e:
         console.print(f"[error]Configuration error: {str(e)}[/]")
     except Exception as e:
-        console.print(f"[error]Validation failed: {str(e)}[/]") 
+        console.print(f"[error]Validation failed: {str(e)}[/]")
+
+@config.command()
+def ping():
+    """Test API connectivity with the ping endpoint"""
+    try:
+        from porkbun.api import make_request
+        import asyncio
+        
+        console.print("Testing API connectivity...")
+        result = asyncio.run(make_request("ping", {}))
+        
+        if result.get('status') == 'SUCCESS':
+            your_ip = result.get('yourIp', 'Unknown')
+            console.print(f"[success]API connection successful![/]")
+            console.print(f"Your IP: [bold]{your_ip}[/]")
+            console.print("\nIf you still encounter 403 errors, please verify:")
+            console.print("1. This IP address is allowed in your Porkbun API settings")
+            console.print("2. API access is enabled for the domains you're trying to manage")
+        else:
+            console.print(f"[error]API connection failed![/]")
+            console.print(f"Response: {result}")
+    except Exception as e:
+        console.print(f"[error]API connection failed: {str(e)}[/]") 
