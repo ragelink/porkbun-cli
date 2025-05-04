@@ -185,8 +185,10 @@ def propagation(domain: str, record_type: str, nameservers: List[str],
 @click.option('--timeout', type=int, default=15, help='Request timeout in seconds')
 @click.option('--max-runtime', type=int, help='Maximum runtime in seconds (no limit if not specified)')
 @click.option('--test-mode', is_flag=True, hidden=True, help='Exit after one check (for testing)')
+@click.option('--verbose', '-v', is_flag=True, help='Show verbose output including HTTP headers')
 def health(domain: str, protocol: str, port: Optional[int], path: str,
-           interval: int, expect_status: int, timeout: int, max_runtime: Optional[int], test_mode: bool):
+           interval: int, expect_status: int, timeout: int, max_runtime: Optional[int], 
+           test_mode: bool, verbose: bool):
     """Monitor domain health."""
     if not validate_domain(domain):
         console.print("[error]Invalid domain format[/]")
@@ -200,6 +202,21 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
     
     # Ensure timeout is at least 1 second
     timeout = max(1, timeout)
+
+    # Track statistics
+    stats = {
+        "requests": 0,
+        "success": 0,
+        "errors": 0,
+        "timeouts": 0,
+        "fastest": float('inf'),
+        "slowest": 0,
+        "total_time": 0
+    }
+
+    # Debug - print max_runtime value
+    if max_runtime:
+        console.print(f"[info]Max runtime set to {max_runtime} seconds[/]")
         
     try:
         url = f"{protocol}://{domain}"
@@ -218,8 +235,14 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
             
             while True:
                 # Check if max runtime has been exceeded
-                if max_runtime and (time.time() - start_time > max_runtime):
+                current_time = time.time()
+                elapsed = int(current_time - start_time)
+                
+                if max_runtime and (elapsed >= max_runtime):
+                    avg_time = stats["total_time"] / stats["requests"] if stats["requests"] > 0 else 0
                     console.print(f"\n[info]Reached maximum runtime of {max_runtime} seconds[/]")
+                    console.print(f"[info]Stats: {stats['requests']} requests, {stats['success']} successful, {stats['errors']} errors, {stats['timeouts']} timeouts[/]")
+                    console.print(f"[info]Response times: avg {avg_time:.2f}s, min {stats['fastest']:.2f}s, max {stats['slowest']:.2f}s[/]")
                     return 0
                 
                 try:
@@ -228,24 +251,41 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
                     response = requests.get(url, timeout=timeout)
                     response_time = time.time() - check_start_time
                     
+                    # Update stats
+                    stats["requests"] += 1
+                    stats["success"] += 1
+                    stats["fastest"] = min(stats["fastest"], response_time)
+                    stats["slowest"] = max(stats["slowest"], response_time)
+                    stats["total_time"] += response_time
+                    
                     status_style = "green" if response.status_code == expect_status else "red"
                     time_style = "green" if response_time < 1.0 else "yellow"
                     
                     # Add runtime information if max_runtime is set
                     runtime_info = ""
                     if max_runtime:
-                        elapsed = int(time.time() - start_time)
                         remaining = max_runtime - elapsed
                         runtime_info = f" | Runtime: {elapsed}s" + (f" ({remaining}s remaining)" if remaining > 0 else "")
                     
-                    progress.update(
-                        task,
-                        description=(
-                            f"Status: [{status_style}]{response.status_code}[/] | "
-                            f"Response Time: [{time_style}]{response_time:.2f}s[/]"
-                            f"{runtime_info}"
-                        )
+                    # Create status message
+                    status_msg = (
+                        f"Status: [{status_style}]{response.status_code}[/] | "
+                        f"Response Time: [{time_style}]{response_time:.2f}s[/]"
+                        f"{runtime_info}"
                     )
+                    
+                    # Add stats to every 10th request
+                    if stats["requests"] % 10 == 0:
+                        avg_time = stats["total_time"] / stats["requests"]
+                        status_msg += f" | Avg: {avg_time:.2f}s"
+                    
+                    progress.update(task, description=status_msg)
+                    
+                    # Show headers in verbose mode
+                    if verbose:
+                        console.print("\nResponse Headers:")
+                        for header, value in response.headers.items():
+                            console.print(f"  {header}: {value}")
                     
                     # Exit after first check if we're in test mode
                     if is_test:
@@ -253,17 +293,23 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
                         return 0
                         
                 except requests.exceptions.Timeout:
+                    stats["requests"] += 1
+                    stats["timeouts"] += 1
+                    
                     progress.update(
                         task,
-                        description=f"[red]Error: Request timed out after {timeout}s[/]"
+                        description=f"[red]Error: Request timed out after {timeout}s[/] | Timeouts: {stats['timeouts']}"
                     )
                     if is_test:
                         console.print("\n[info]Health check timed out (test mode)[/]")
                         return 1
                 except requests.exceptions.RequestException as e:
+                    stats["requests"] += 1
+                    stats["errors"] += 1
+                    
                     progress.update(
                         task,
-                        description=f"[red]Error: {str(e)}[/]"
+                        description=f"[red]Error: {str(e)}[/] | Errors: {stats['errors']}"
                     )
                     
                     # Exit after first error if we're in test mode
@@ -271,10 +317,17 @@ def health(domain: str, protocol: str, port: Optional[int], path: str,
                         console.print("\n[info]Health check completed with error (test mode)[/]")
                         return 1
                 
-                time.sleep(interval)
+                # Sleep more precisely to reach the desired interval
+                # Calculate the exact time to wait
+                elapsed_since_check = time.time() - check_start_time
+                sleep_time = max(0.1, interval - elapsed_since_check)
+                time.sleep(sleep_time)
                 
     except KeyboardInterrupt:
+        avg_time = stats["total_time"] / stats["requests"] if stats["requests"] > 0 else 0
         console.print("\n[info]Health monitoring stopped[/]")
+        console.print(f"[info]Stats: {stats['requests']} requests, {stats['success']} successful, {stats['errors']} errors, {stats['timeouts']} timeouts[/]")
+        console.print(f"[info]Response times: avg {avg_time:.2f}s, min {stats['fastest']:.2f}s, max {stats['slowest']:.2f}s[/]")
     except Exception as e:
         logger.error(f"Error monitoring health: {e}")
         console.print(f"[error]Error: {str(e)}[/]")
