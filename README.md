@@ -23,7 +23,7 @@ A powerful command-line interface tool for managing domains, DNS records, SSL ce
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/porkbun-cli.git
+   git clone https://github.com/ragelink/porkbun-cli.git
    cd porkbun-cli
    ```
 
