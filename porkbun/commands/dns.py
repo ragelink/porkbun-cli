@@ -101,23 +101,32 @@ def validate_ttl_callback(ctx, param, value):
 # Create a new DNS record
 @dns.command()
 @click.argument("domain")
+@click.argument("name")
 @click.argument("record_type")
 @click.argument("content")
-@click.argument("ttl", type=int, callback=validate_ttl_callback)
-def create_record(domain, record_type, content, ttl):
-    """Create a new DNS record"""
+# TTL defaults to 600 (same as Porkbun web UI)
+@click.argument("ttl", type=int, default=600, required=False, callback=validate_ttl_callback)
+def create_record(domain, name, record_type, content, ttl):
+    """Create a new DNS record.
+
+    NAME is the subdomain (e.g., 'www', 'mail'). Use '@' or '' for the root domain.
+    """
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
-        
+
     if not validate_record_type(record_type):
         raise click.BadParameter("Invalid record type")
-        
+
     if record_type.upper() == 'A' and not validate_ip_address(content):
         raise click.BadParameter("Invalid IP address format")
-    
+
+    # Normalize name: '@' or empty string means root domain
+    if name == '@':
+        name = ''
+
     try:
-        data = {"domain": domain, "type": record_type, "content": content, "ttl": str(ttl)}
-        result = asyncio.run(make_request("dns/create", data))
+        data = {"type": record_type, "name": name, "content": content, "ttl": str(ttl)}
+        result = asyncio.run(make_request(f"dns/create/{domain}", data))
         click.echo(result)
         return 0
     except PorkbunAPIError as e:
