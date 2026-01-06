@@ -104,19 +104,22 @@ def validate_ttl_callback(ctx, param, value):
 @click.argument("record_type")
 @click.argument("content")
 @click.argument("ttl", type=int, callback=validate_ttl_callback)
-def create_record(domain, record_type, content, ttl):
+@click.option("--priority", type=int, help="Priority for MX/SRV records")
+def create_record(domain, record_type, content, ttl, priority):
     """Create a new DNS record"""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
-        
+
     if not validate_record_type(record_type):
         raise click.BadParameter("Invalid record type")
-        
+
     if record_type.upper() == 'A' and not validate_ip_address(content):
         raise click.BadParameter("Invalid IP address format")
-    
+
     try:
         data = {"domain": domain, "type": record_type, "content": content, "ttl": str(ttl)}
+        if priority is not None:
+            data["prio"] = str(priority)
         result = asyncio.run(make_request("dns/create", data))
         click.echo(result)
         return 0
@@ -244,11 +247,12 @@ def validate_records_json(ctx, param, value):
 @click.option("--record-type", help="Record type for single record update")
 @click.option("--content", help="Record content for single record update")
 @click.option("--ttl", type=int, help="TTL for single record update")
-def update_record(domain, records=None, record_id=None, record_type=None, content=None, ttl=None):
+@click.option("--priority", type=int, help="Priority for MX/SRV records")
+def update_record(domain, records=None, record_id=None, record_type=None, content=None, ttl=None, priority=None):
     """Update DNS records"""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
-        
+
     if records:
         # Bulk update
         for record in records:
@@ -258,19 +262,21 @@ def update_record(domain, records=None, record_id=None, record_type=None, conten
             if "content" not in record and "ttl" not in record:
                 click.echo("Error: At least one of content or TTL is required for updates")
                 return 1
-            
+
             data = {
                 "domain": domain,
                 "id": record["id"]
             }
-            
+
             if "type" in record:
                 data["type"] = record["type"]
             if "content" in record:
                 data["content"] = record["content"]
             if "ttl" in record:
                 data["ttl"] = str(record["ttl"])
-            
+            if "priority" in record:
+                data["prio"] = str(record["priority"])
+
             result = asyncio.run(make_request("dns/update", data))
             click.echo(f"Updated record {record['id']}: {result}")
     else:
@@ -278,25 +284,27 @@ def update_record(domain, records=None, record_id=None, record_type=None, conten
         if not record_id:
             click.echo("Error: Record ID is required")
             return 1
-        if not content and not ttl:
-            click.echo("Error: At least one of content or TTL is required")
+        if not content and not ttl and not priority:
+            click.echo("Error: At least one of content, TTL, or priority is required")
             return 1
-        
+
         data = {
             "domain": domain,
             "id": record_id
         }
-        
+
         if record_type:
             data["type"] = record_type
         if content:
             data["content"] = content
         if ttl:
             data["ttl"] = str(ttl)
-        
+        if priority is not None:
+            data["prio"] = str(priority)
+
         result = asyncio.run(make_request("dns/update", data))
         click.echo(result)
-    
+
     return 0
 
 # Delete a DNS record
@@ -415,6 +423,7 @@ def batch_update(domain, batch_file):
                 record_name = record.get('name')
                 record_content = record.get('content')
                 record_ttl = record.get('ttl', 600)
+                record_prio = record.get('priority')  # MX/SRV records
                 
                 # Validate record
                 if not record_type or not record_name or not record_content:
@@ -465,6 +474,8 @@ def batch_update(domain, batch_file):
                         "content": record_content,
                         "ttl": record_ttl
                     }
+                    if record_prio is not None:
+                        data["prio"] = str(record_prio)
                     update_result = asyncio.run(make_request(endpoint, data))
                     if update_result.get('status') == 'SUCCESS':
                         console.print(f"[green]Updated record: {record_type} {record_name}[/]")
@@ -481,6 +492,8 @@ def batch_update(domain, batch_file):
                         "content": record_content,
                         "ttl": record_ttl
                     }
+                    if record_prio is not None:
+                        data["prio"] = str(record_prio)
                     create_result = asyncio.run(make_request(endpoint, data))
                     if create_result.get('status') == 'SUCCESS':
                         console.print(f"[green]Created record: {record_type} {record_name}[/]")
