@@ -105,7 +105,7 @@ def validate_ttl_callback(ctx, param, value):
 @click.argument("content")
 @click.argument("ttl", type=int, callback=validate_ttl_callback)
 def create_record(domain, record_type, content, ttl):
-    """Create a new DNS record"""
+    """Create a new DNS record. Use batch-create for bulk operations."""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
         
@@ -201,110 +201,50 @@ def retrieve_records(domain):
         ctx = click.get_current_context()
         ctx.exit(1)
 
-def validate_records_json(ctx, param, value):
-    """Validate records JSON"""
-    if not value:
-        return None
-    try:
-        print(f"Validating records JSON: {value}")
-        records = json.loads(value)
-        if not isinstance(records, list):
-            print("Not a list")
-            raise click.BadParameter("Records must be a JSON array")
-        for record in records:
-            print(f"Validating record: {record}")
-            if not isinstance(record, dict):
-                print("Not a dict")
-                raise click.BadParameter("Each record must be a JSON object")
-            if not all(k in record for k in ["id", "type", "content", "ttl"]):
-                print("Missing required fields")
-                raise click.BadParameter("Each record must have id, type, content, and ttl fields")
-            if not validate_record_type(record["type"]):
-                print(f"Invalid record type: {record['type']}")
-                raise click.BadParameter(f"Invalid record type in record {record['id']}")
-            if record["type"].upper() == 'A' and not validate_ip_address(record["content"]):
-                print(f"Invalid IP address: {record['content']}")
-                raise click.BadParameter(f"Invalid IP address in record {record['id']}")
-            if not validate_ttl(str(record["ttl"])):
-                print(f"Invalid TTL: {record['ttl']}")
-                raise click.BadParameter(f"Invalid TTL in record {record['id']}")
-        return records
-    except json.JSONDecodeError as e:
-        print(f"JSON decode error: {e}")
-        raise click.BadParameter(f"Invalid JSON format in records parameter: {str(e)}")
-    except (KeyError, TypeError) as e:
-        print(f"Record format error: {e}")
-        raise click.BadParameter(f"Invalid record format: {str(e)}")
-
 # Update a DNS record
 @dns.command()
 @click.argument("domain")
-@click.option("--records", callback=validate_records_json, help="JSON array of records to update in bulk")
-@click.option("--record-id", help="Record ID for single record update")
-@click.option("--record-type", help="Record type for single record update")
-@click.option("--content", help="Record content for single record update")
-@click.option("--ttl", type=int, help="TTL for single record update")
-def update_record(domain, records=None, record_id=None, record_type=None, content=None, ttl=None):
-    """Update DNS records"""
+@click.argument("record_id")
+@click.option("--record-type", help="Record type")
+@click.option("--content", help="Record content")
+@click.option("--ttl", type=int, help="TTL value")
+def update_record(domain, record_id, record_type=None, content=None, ttl=None):
+    """Update a single DNS record. Use batch-update for bulk operations."""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
-        
-    if records:
-        # Bulk update
-        for record in records:
-            if "id" not in record:
-                click.echo("Error: Record ID is required for updates")
-                return 1
-            if "content" not in record and "ttl" not in record:
-                click.echo("Error: At least one of content or TTL is required for updates")
-                return 1
-            
-            data = {
-                "domain": domain,
-                "id": record["id"]
-            }
-            
-            if "type" in record:
-                data["type"] = record["type"]
-            if "content" in record:
-                data["content"] = record["content"]
-            if "ttl" in record:
-                data["ttl"] = str(record["ttl"])
-            
-            result = asyncio.run(make_request("dns/update", data))
-            click.echo(f"Updated record {record['id']}: {result}")
-    else:
-        # Single record update
-        if not record_id:
-            click.echo("Error: Record ID is required")
-            return 1
-        if not content and not ttl:
-            click.echo("Error: At least one of content or TTL is required")
-            return 1
-        
-        data = {
-            "domain": domain,
-            "id": record_id
-        }
-        
-        if record_type:
-            data["type"] = record_type
-        if content:
-            data["content"] = content
-        if ttl:
-            data["ttl"] = str(ttl)
-        
+
+    if not content and not ttl:
+        click.echo("Error: At least one of --content or --ttl is required")
+        ctx = click.get_current_context()
+        ctx.exit(1)
+
+    data = {
+        "domain": domain,
+        "id": record_id
+    }
+
+    if record_type:
+        data["type"] = record_type
+    if content:
+        data["content"] = content
+    if ttl:
+        data["ttl"] = str(ttl)
+
+    try:
         result = asyncio.run(make_request("dns/update", data))
         click.echo(result)
-    
-    return 0
+        return 0
+    except PorkbunAPIError as e:
+        click.echo(f"Error: {str(e)}")
+        ctx = click.get_current_context()
+        ctx.exit(1)
 
 # Delete a DNS record
 @dns.command()
 @click.argument("domain")
 @click.argument("record_id")
 def delete_record(domain, record_id):
-    """Delete a DNS record"""
+    """Delete a DNS record. Use batch-delete for bulk operations."""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
         
@@ -361,6 +301,103 @@ def batch_delete(domain, record_ids):
         console.print(f"[bold yellow]Deleted {success_count} records successfully with {error_count} errors from {domain}[/]")
     else:
         console.print(f"[bold red]Failed to delete any DNS records from {domain}[/]")
+
+# Batch create DNS records for a domain
+@dns.command()
+@click.argument("domain")
+@click.argument("batch_file", type=click.Path(exists=True, readable=True))
+def batch_create(domain, batch_file):
+    """Batch create DNS records for a domain using a JSON file.
+
+    The JSON file should contain an array of DNS record objects with the following fields:
+    - type: Record type (A, AAAA, MX, CNAME, TXT, NS, etc.)
+    - name: Record name (use '@' for root domain)
+    - content: Record content
+    - ttl: Time to live (optional, defaults to 600)
+    - priority: Priority for MX/SRV records (optional)
+
+    Example JSON file:
+    [
+        {"type": "A", "name": "@", "content": "192.0.2.1", "ttl": 600},
+        {"type": "CNAME", "name": "www", "content": "example.com", "ttl": 600},
+        {"type": "MX", "name": "@", "content": "mail.example.com", "ttl": 600, "priority": 10}
+    ]
+    """
+    if not validate_domain(domain):
+        raise click.BadParameter("Invalid domain format")
+
+    try:
+        with open(batch_file, 'r') as f:
+            records = json.load(f)
+
+        if not isinstance(records, list):
+            console.print("[error]Batch file must contain a JSON array of DNS record objects[/]")
+            ctx = click.get_current_context()
+            ctx.exit(1)
+
+        success_count = 0
+        error_count = 0
+
+        with console.status(f"[bold green]Creating {len(records)} DNS records for {domain}...[/]") as status:
+            for i, record in enumerate(records):
+                record_type = record.get('type')
+                record_name = record.get('name', '')
+                record_content = record.get('content')
+                record_ttl = record.get('ttl', 600)
+                record_prio = record.get('priority')
+
+                if not record_type or not record_content:
+                    console.print(f"[error]Record {i+1}: Missing required fields (type, content)[/]")
+                    error_count += 1
+                    continue
+
+                try:
+                    validate_record_type(record_type)
+                    validate_ttl(record_ttl)
+                except click.BadParameter as e:
+                    console.print(f"[error]Record {i+1}: {str(e)}[/]")
+                    error_count += 1
+                    continue
+
+                # Normalize name: '@' or empty means root domain
+                if record_name == '@':
+                    record_name = ''
+
+                status.update(f"[bold green]Creating record {i+1}/{len(records)}: {record_type} {record_name or '(root)'}[/]")
+
+                data = {
+                    "type": record_type,
+                    "name": record_name,
+                    "content": record_content,
+                    "ttl": str(record_ttl)
+                }
+                if record_prio is not None:
+                    data["prio"] = str(record_prio)
+
+                create_result = asyncio.run(make_request(f"dns/create/{domain}", data))
+                if create_result.get('status') == 'SUCCESS':
+                    console.print(f"[green]Created record: {record_type} {record_name or '(root)'}[/]")
+                    success_count += 1
+                else:
+                    console.print(f"[error]Failed to create record: {create_result.get('message', 'Unknown error')}[/]")
+                    error_count += 1
+
+        if success_count > 0 and error_count == 0:
+            console.print(f"[bold green]Successfully created all {success_count} DNS records for {domain}[/]")
+        elif success_count > 0:
+            console.print(f"[bold yellow]Created {success_count} records successfully with {error_count} errors for {domain}[/]")
+        else:
+            console.print(f"[bold red]Failed to create any DNS records for {domain}[/]")
+
+        return 0
+    except json.JSONDecodeError:
+        console.print(f"[error]Invalid JSON in batch file {batch_file}[/]")
+        ctx = click.get_current_context()
+        ctx.exit(1)
+    except Exception as e:
+        console.print(f"[error]Error: {str(e)}[/]")
+        ctx = click.get_current_context()
+        ctx.exit(1)
 
 # Batch update DNS records for a domain
 @dns.command()
