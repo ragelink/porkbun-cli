@@ -90,6 +90,31 @@ def get_tld_pricing() -> Dict:
         console.print(f"[error]Could not fetch TLD pricing: {str(e)}[/]")
         return {}
 
+def get_renewal_price(domain: str) -> str:
+    """Look up a domain's renewal price (decimal-dollar string) via pricing/get.
+
+    pricing/get returns {"pricing": {"<tld>": {"renewal": "9.73", ...}, ...}}.
+    Resolve the TLD by trying the longest matching key (handles multi-label TLDs
+    like co.uk), falling back to the substring after the first dot.
+    """
+    result = asyncio.run(make_request("pricing/get", {}))
+    pricing = result.get('pricing', {})
+
+    labels = domain.split('.')
+    tld = None
+    # Try longest matching TLD first (e.g. co.uk before uk)
+    for i in range(1, len(labels)):
+        candidate = '.'.join(labels[i:])
+        if candidate in pricing:
+            tld = candidate
+            break
+    if tld is None:
+        tld = '.'.join(labels[1:]) if len(labels) > 1 else domain
+
+    if tld not in pricing:
+        raise click.ClickException(f"No pricing found for TLD '{tld}' (domain {domain})")
+    return pricing[tld]['renewal']
+
 def suggest_domains(base_domain: str, tld_pricing: Dict) -> List[Dict]:
     """Suggest alternative domain names based on available TLDs."""
     suggestions = []
@@ -346,8 +371,9 @@ def check(domain: str, suggest: bool, compare: bool, watch: Optional[float],
 @click.argument("password")
 def create(domain, password):
     """Create a new domain"""
-    data = {"domain": domain, "password": password}
-    result = asyncio.run(make_request("domain/create", data))
+    # TODO: domain/create requires cost + agreeToTerms per current API
+    data = {"password": password}
+    result = asyncio.run(make_request(f"domain/create/{domain}", data))
     click.echo(result)
 
 # Delete a domain
@@ -355,9 +381,7 @@ def create(domain, password):
 @click.argument("domain")
 def delete(domain):
     """Delete a domain"""
-    data = {"domain": domain}
-    result = asyncio.run(make_request("domain/delete", data))
-    click.echo(result)
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no domain-delete endpoint. Porkbun does not support domain deletion via API; use the dashboard: https://porkbun.com/account")
 
 # Update name servers for a domain
 @domains.command()
@@ -365,8 +389,8 @@ def delete(domain):
 @click.argument("nameservers", nargs=-1)
 def update_name_servers(domain, nameservers):
     """Update name servers for a domain"""
-    data = {"domain": domain, "nameservers": list(nameservers)}
-    result = asyncio.run(make_request("domain/updateNameServers", data))
+    data = {"ns": list(nameservers)}
+    result = asyncio.run(make_request(f"domain/updateNs/{domain}", data))
     click.echo(result)
 
 # Retrieve name servers for a domain
@@ -374,18 +398,20 @@ def update_name_servers(domain, nameservers):
 @click.argument("domain")
 def retrieve_name_servers(domain):
     """Retrieve name servers for a domain"""
-    data = {"domain": domain}
-    result = asyncio.run(make_request("domain/retrieveNameServers", data))
-    click.echo(result)
+    result = asyncio.run(make_request(f"domain/getNs/{domain}", {}))
+    # Nameservers are returned in the `ns` field (fallback to `nameservers`)
+    nameservers = result.get('ns', result.get('nameservers'))
+    if nameservers is not None:
+        click.echo(nameservers)
+    else:
+        click.echo(result)
 
 # List contacts for a domain
 @domains.command()
 @click.argument("domain")
 def list_contacts(domain):
     """List domain contacts"""
-    data = {"domain": domain}
-    result = asyncio.run(make_request("domain/listContacts", data))
-    click.echo(result)
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no domain-contacts endpoint; manage contacts in the dashboard.")
 
 # Update contacts for a domain
 @domains.command()
@@ -393,9 +419,7 @@ def list_contacts(domain):
 @click.argument("contacts", nargs=-1)
 def update_contacts(domain, contacts):
     """Update domain contacts"""
-    data = {"domain": domain, "contacts": list(contacts)}
-    result = asyncio.run(make_request("domain/updateContacts", data))
-    click.echo(result)
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no domain-contacts endpoint; manage contacts in the dashboard.")
 
 @dns.command()
 @click.argument('domain')
@@ -600,8 +624,9 @@ def bulk(domains: tuple, file: Optional[str], years: int, nameservers: tuple,
                 }
                 if nameservers:
                     data["ns"] = list(nameservers)
-                
-                result = asyncio.run(make_request(f"domain/register/{domain}", data))
+
+                # TODO: domain/create requires cost + agreeToTerms per current API
+                result = asyncio.run(make_request(f"domain/create/{domain}", data))
                 if result.get('status') == 'SUCCESS':
                     console.print(f"[success]Successfully registered {domain}[/]")
                 else:
@@ -641,7 +666,7 @@ def bulk(domains: tuple, file: Optional[str], auth_code: str,
         for domain in domain_list:
             progress.update(task, description=f"Checking {domain}")
             try:
-                data = asyncio.run(make_request(f"domain/transferCheck/{domain}", {}))
+                data = asyncio.run(make_request(f"domain/getTransfer/{domain}", {}))
                 if data.get('status') == 'SUCCESS':
                     price = float(data.get('response', {}).get('price', 0))
                     eligible_domains.append((domain, price))
@@ -706,7 +731,7 @@ def bulk(domains: tuple, file: Optional[str], auth_code: str,
 def status():
     """Check status of pending transfers."""
     try:
-        result = asyncio.run(make_request("domain/transferList", {}))
+        result = asyncio.run(make_request("domain/listTransfers", {}))
         if not result.get('transfers'):
             console.print("[info]No pending transfers[/]")
             return
@@ -769,25 +794,17 @@ def retrieve(domain: str):
 @click.argument('domain')
 def generate(domain: str):
     """Generate a new SSL certificate"""
-    try:
-        result = asyncio.run(make_request(f"ssl/generate/{domain}", {}))
-        if result.get('status') == 'SUCCESS':
-            console.print(f"[success]Successfully generated SSL certificate for {domain}[/]")
-            # Show the certificate details
-            retrieve.callback(domain)
-        else:
-            console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error: {str(e)}[/]")
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no ssl-generate endpoint. Porkbun auto-generates SSL certs; there is no generate endpoint. Retrieve the bundle with the ssl retrieve command.")
 
 @account.command()
 def balance():
     """Check account balance"""
     try:
-        result = asyncio.run(make_request("balance", {}))
+        result = asyncio.run(make_request("account/balance", {}))
         if result.get('status') == 'SUCCESS':
-            balance = result.get('balance', 0)
-            console.print(f"Current balance: [green]${balance:.2f}[/]")
+            # balance is an integer number of cents; prefer preformatted `display`
+            balance = result.get('display') or f"${result.get('balance', 0)/100:.2f}"
+            console.print(f"Current balance: [green]{balance}[/]")
         else:
             console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
     except Exception as e:
@@ -797,80 +814,20 @@ def balance():
 @click.option('--limit', type=int, default=10, help='Number of transactions to show')
 def transactions(limit: int):
     """View recent transactions"""
-    try:
-        result = asyncio.run(make_request("transactions", {"limit": limit}))
-        if result.get('status') == 'SUCCESS':
-            transactions = result.get('transactions', [])
-            
-            table = Table(title="Recent Transactions")
-            table.add_column("Date", style="cyan")
-            table.add_column("Type", style="yellow")
-            table.add_column("Description")
-            table.add_column("Amount", justify="right", style="green")
-            table.add_column("Balance", justify="right")
-            
-            for tx in transactions:
-                amount = float(tx.get('amount', 0))
-                amount_str = f"${abs(amount):.2f}"
-                if amount < 0:
-                    amount_str = f"-{amount_str}"
-                
-                table.add_row(
-                    tx.get('date', ''),
-                    tx.get('type', ''),
-                    tx.get('description', ''),
-                    amount_str,
-                    f"${float(tx.get('balance', 0)):.2f}"
-                )
-            
-            console.print(table)
-        else:
-            console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error: {str(e)}[/]")
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no transactions endpoint; see https://porkbun.com/account/billing")
 
 @domains.command()
 @click.argument('domain')
 def whois(domain: str):
     """Get WHOIS information for a domain"""
-    try:
-        result = asyncio.run(make_request(f"whois/{domain}", {}))
-        if result.get('status') == 'SUCCESS':
-            whois_data = result.get('whois', {})
-            
-            table = Table(title=f"WHOIS Information for {domain}")
-            table.add_column("Property", style="cyan")
-            table.add_column("Value", style="green")
-            
-            # Add WHOIS details to table
-            for key, value in whois_data.items():
-                if isinstance(value, (list, tuple)):
-                    value = '\n'.join(value)
-                elif isinstance(value, dict):
-                    value = '\n'.join(f"{k}: {v}" for k, v in value.items())
-                table.add_row(key.replace('_', ' ').title(), str(value))
-            
-            console.print(table)
-        else:
-            console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error: {str(e)}[/]")
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no WHOIS-lookup endpoint.")
 
 @domains.command()
 @click.argument('domain')
 @click.option('--enable/--disable', default=True, help='Enable or disable WHOIS privacy')
 def privacy(domain: str, enable: bool):
     """Manage WHOIS privacy for a domain"""
-    try:
-        endpoint = "enableWhoisPrivacy" if enable else "disableWhoisPrivacy"
-        result = asyncio.run(make_request(f"domain/{endpoint}/{domain}", {}))
-        if result.get('status') == 'SUCCESS':
-            status = "enabled" if enable else "disabled"
-            console.print(f"[success]Successfully {status} WHOIS privacy for {domain}[/]")
-        else:
-            console.print(f"[error]Error: {result.get('message', 'Unknown error')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error: {str(e)}[/]")
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no WHOIS-privacy endpoint; privacy is on by default and managed in the dashboard.")
 
 @domains.command()
 def watch_list():
@@ -949,19 +906,15 @@ def bulk(domains: tuple, file: Optional[str], years: int, force: bool):
         for domain in domain_list:
             progress.update(task, description=f"Checking {domain}")
             try:
-                result = asyncio.run(make_request(f"domain/getRenewalPrice/{domain}", {}))
-                if result.get('status') == 'SUCCESS':
-                    price = float(result.get('renewalPrice', 0))
-                    expiry = result.get('expirationDate', 'Unknown')
-                    renewals.append({
-                        'domain': domain,
-                        'price': price,
-                        'years': years,
-                        'expiry': expiry
-                    })
-                    total_cost += price * years
-                else:
-                    console.print(f"[error]Error getting price for {domain}: {result.get('message')}[/]")
+                price = float(get_renewal_price(domain))
+                expiry = 'Unknown'  # pricing/get does not return expiration dates
+                renewals.append({
+                    'domain': domain,
+                    'price': price,
+                    'years': years,
+                    'expiry': expiry
+                })
+                total_cost += price * years
             except Exception as e:
                 console.print(f"[error]Error checking {domain}: {str(e)}[/]")
             progress.advance(task)
@@ -1007,8 +960,7 @@ def bulk(domains: tuple, file: Optional[str], years: int, force: bool):
         for renewal in renewals:
             progress.update(task, description=f"Renewing {renewal['domain']}")
             try:
-                result = asyncio.run(make_request("domain/renew", {
-                    "domain": renewal['domain'],
+                result = asyncio.run(make_request(f"domain/renew/{renewal['domain']}", {
                     "years": renewal['years']
                 }))
                 if result.get('status') == 'SUCCESS':
@@ -1038,10 +990,9 @@ def auto():
         for domain in result['domains']:
             domain_name = domain['domain']
             try:
-                info = asyncio.run(make_request(f"domain/getRenewalPrice/{domain_name}", {}))
                 auto_renewal = "[green]Enabled[/]" if domain.get('autoRenew') else "[red]Disabled[/]"
-                expiry = info.get('expirationDate', 'Unknown')
-                price = f"${float(info.get('renewalPrice', 0)):.2f}"
+                expiry = domain.get('expireDate', 'Unknown')
+                price = f"${float(get_renewal_price(domain_name)):.2f}"
                 
                 table.add_row(
                     domain_name,
@@ -1068,7 +1019,7 @@ def auto():
 def set_auto(domain: str, enable: bool):
     """Enable or disable auto-renewal for a domain."""
     try:
-        result = asyncio.run(make_request(f"domain/setAutoRenew/{domain}", {"autoRenew": enable}))
+        result = asyncio.run(make_request(f"domain/updateAutoRenew/{domain}", {"autoRenew": enable}))
         if result.get('status') == 'SUCCESS':
             status = "enabled" if enable else "disabled"
             console.print(f"[success]Successfully {status} auto-renewal for {domain}[/]")
@@ -1103,18 +1054,17 @@ def expiring():
                 domain_name = domain['domain']
                 progress.update(task, description=f"Checking {domain_name}")
                 try:
-                    info = asyncio.run(make_request(f"domain/getRenewalPrice/{domain_name}", {}))
-                    expiry_date = info.get('expirationDate')
+                    expiry_date = domain.get('expireDate')
                     if expiry_date:
                         expiry_time = time.mktime(time.strptime(expiry_date, "%Y-%m-%d"))
                         days_until_expiry = (expiry_time - current_time) / (24 * 60 * 60)
-                        
+
                         if days_until_expiry <= 30:
                             expiring_domains.append({
                                 'domain': domain_name,
                                 'expiry': expiry_date,
                                 'days': int(days_until_expiry),
-                                'price': float(info.get('renewalPrice', 0)),
+                                'price': float(get_renewal_price(domain_name)),
                                 'auto_renew': domain.get('autoRenew', False)
                             })
                 except Exception as e:

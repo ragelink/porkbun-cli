@@ -36,17 +36,20 @@ def balance():
     """Check account balance."""
     try:
         # Run the async function in an event loop
-        result = asyncio.run(make_request("balance/get", {}))
+        result = asyncio.run(make_request("account/balance", {}))
         if result.get('status') == 'SUCCESS':
+            # Porkbun returns `balance` as an integer number of cents and a
+            # preformatted human-readable `display` string (e.g. "$12.34").
+            display = result.get('display')
+            if not display:
+                cents = result.get('balance', 0) or 0
+                display = f"${cents / 100:.2f}"
+
             table = Table(title="Account Balance")
             table.add_column("Balance", style="green")
-            table.add_column("Currency", style="dim")
-            
-            table.add_row(
-                f"${result.get('balance', '0.00')}",
-                result.get('currency', 'USD')
-            )
-            
+
+            table.add_row(display)
+
             console.print(table)
         else:
             console.print(f"[error]Error checking balance: {result.get('message')}[/]")
@@ -58,7 +61,13 @@ def balance():
 @click.option('--export', type=click.Choice(['json', 'csv']), help='Export format')
 @click.option('--output', type=click.Path(), help='Output file path')
 def transactions(limit: int, export: Optional[str], output: Optional[str]):
-    """View transaction history."""
+    """View transaction history (unsupported by the Porkbun API)."""
+    # Porkbun's API (v3) exposes no billing/transactions endpoint. Transaction
+    # history is only available in the dashboard.
+    raise click.ClickException(
+        "Not supported: Porkbun's API (v3) has no transactions/billing endpoint. "
+        "View transaction history in the dashboard: https://porkbun.com/account/billing"
+    )
     try:
         # Run the async function in an event loop
         result = asyncio.run(make_request("billing/list", {}))
@@ -114,7 +123,7 @@ def portfolio():
 def list_domains(group: Optional[str], tag: Optional[str], export: Optional[str], output: Optional[str]):
     """List domains in portfolio."""
     try:
-        result = make_request("domain/listAll", {})
+        result = asyncio.run(make_request("domain/listAll", {}))
         if result.get('status') == 'SUCCESS':
             domains = result.get('domains', [])
             if not domains:
@@ -171,7 +180,7 @@ def tag(domain: str, group: Optional[str], tags: Optional[str]):
         
     try:
         # Verify domain exists
-        result = make_request(f"domain/getDomain/{domain}", {})
+        result = asyncio.run(make_request(f"domain/get/{domain}", {}))
         if result.get('status') != 'SUCCESS':
             console.print(f"[error]Domain not found: {domain}[/]")
             return

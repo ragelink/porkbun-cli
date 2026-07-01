@@ -82,152 +82,17 @@ def retrieve(domain: str, save_path: Optional[str]):
 @click.option('--force', is_flag=True, help='Force certificate regeneration')
 def generate(domain: str, save_path: Optional[str], force: bool):
     """Generate SSL certificate for a domain."""
-    if not validate_domain(domain):
-        raise click.BadParameter("Invalid domain format")
-        
-    try:
-        # Check if certificate already exists
-        if not force:
-            existing = asyncio.run(make_request(f"ssl/retrieve/{domain}", {}))
-            if existing.get('status') == 'SUCCESS' and existing.get('certificatechain'):
-                console.print("[warning]Certificate already exists. Use --force to regenerate[/]")
-                return
-        
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TimeElapsedColumn(),
-            console=console
-        ) as progress:
-            task = progress.add_task("Generating certificate...", total=None)
-            
-            result = asyncio.run(make_request(f"ssl/generate/{domain}", {}))
-            if result.get('status') == 'SUCCESS':
-                progress.update(task, description="Certificate generated successfully")
-                
-                # Save certificate files if requested
-                if save_path:
-                    save_path = Path(save_path)
-                    save_path.mkdir(parents=True, exist_ok=True)
-                    
-                    # Save certificate chain
-                    cert_data = result.get('certificatechain', [])
-                    for i, cert in enumerate(cert_data):
-                        file_name = f"{domain}_{i}.crt"
-                        with open(save_path / file_name, 'w') as f:
-                            f.write(cert)
-                    
-                    # Save private key
-                    if result.get('privatekey'):
-                        with open(save_path / f"{domain}.key", 'w') as f:
-                            f.write(result['privatekey'])
-                    
-                    console.print(f"[success]Certificate files saved to {save_path}[/]")
-                    print_installation_guide(domain, save_path)
-            else:
-                console.print(f"[error]Error generating certificate: {result.get('message')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error generating certificate: {str(e)}[/]")
+    raise click.ClickException("Not supported: Porkbun auto-generates SSL certificates; there is no generate endpoint. Use the ssl retrieve command to download the bundle.")
 
 @ssl.command()
 def list_all():
     """List all SSL certificates."""
-    try:
-        result = asyncio.run(make_request("ssl/listAll", {}))
-        if result.get('status') == 'SUCCESS':
-            certs = result.get('certificates', [])
-            if not certs:
-                console.print("[info]No certificates found[/]")
-                return
-                
-            table = Table(title="SSL Certificates")
-            table.add_column("Domain", style="cyan")
-            table.add_column("Type", style="blue")
-            table.add_column("Status", style="bold")
-            table.add_column("Expiry", style="dim")
-            
-            for cert in certs:
-                domain = cert.get('domain')
-                cert_info = cert.get('certificate', {})
-                expiry = cert_info.get('notafter', 'Unknown')
-                status = get_cert_status(expiry)
-                
-                table.add_row(
-                    domain,
-                    cert_info.get('type', 'Standard'),
-                    status,
-                    expiry
-                )
-            
-            console.print(table)
-        else:
-            console.print(f"[error]Error listing certificates: {result.get('message')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error listing certificates: {str(e)}[/]")
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no ssl/listAll endpoint. Retrieve a specific domain's bundle with the ssl retrieve command.")
 
 @ssl.command()
 def expiring():
     """List certificates expiring soon."""
-    try:
-        result = asyncio.run(make_request("ssl/listAll", {}))
-        if result.get('status') == 'SUCCESS':
-            certs = result.get('certificates', [])
-            if not certs:
-                console.print("[info]No certificates found[/]")
-                return
-                
-            # Filter and sort certificates by expiry
-            expiring_certs = []
-            current_time = time.time()
-            
-            for cert in certs:
-                domain = cert.get('domain')
-                cert_info = cert.get('certificate', {})
-                expiry = cert_info.get('notafter')
-                
-                if expiry:
-                    try:
-                        expiry_time = datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S")
-                        days_until_expiry = (expiry_time.timestamp() - current_time) / (24 * 60 * 60)
-                        
-                        if days_until_expiry <= 30:  # Show certs expiring in 30 days
-                            expiring_certs.append({
-                                'domain': domain,
-                                'type': cert_info.get('type', 'Standard'),
-                                'days': int(days_until_expiry),
-                                'expiry': expiry
-                            })
-                    except ValueError:
-                        continue
-            
-            if not expiring_certs:
-                console.print("[info]No certificates expiring in the next 30 days[/]")
-                return
-                
-            # Sort by days until expiry
-            expiring_certs.sort(key=lambda x: x['days'])
-            
-            table = Table(title="Certificates Expiring Soon")
-            table.add_column("Domain", style="cyan")
-            table.add_column("Type", style="blue")
-            table.add_column("Days Left", justify="right")
-            table.add_column("Expiry Date", style="dim")
-            
-            for cert in expiring_certs:
-                days_style = "red" if cert['days'] <= 7 else "yellow" if cert['days'] <= 14 else "green"
-                table.add_row(
-                    cert['domain'],
-                    cert['type'],
-                    f"[{days_style}]{cert['days']}[/]",
-                    cert['expiry']
-                )
-            
-            console.print(table)
-        else:
-            console.print(f"[error]Error listing certificates: {result.get('message')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error listing certificates: {str(e)}[/]")
+    raise click.ClickException("Not supported: Porkbun's API (v3) has no ssl/listAll endpoint. Retrieve a specific domain's bundle with the ssl retrieve command.")
 
 def get_cert_status(expiry: str) -> str:
     """Get certificate status based on expiry date."""

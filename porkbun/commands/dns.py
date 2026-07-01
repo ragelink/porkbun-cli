@@ -116,8 +116,8 @@ def create_record(domain, record_type, content, ttl):
         raise click.BadParameter("Invalid IP address format")
     
     try:
-        data = {"domain": domain, "type": record_type, "content": content, "ttl": str(ttl)}
-        result = asyncio.run(make_request("dns/create", data))
+        data = {"type": record_type, "content": content, "ttl": str(ttl)}
+        result = asyncio.run(make_request(f"dns/create/{domain}", data))
         click.echo(result)
         return 0
     except PorkbunAPIError as e:
@@ -259,19 +259,18 @@ def update_record(domain, records=None, record_id=None, record_type=None, conten
                 click.echo("Error: At least one of content or TTL is required for updates")
                 return 1
             
-            data = {
-                "domain": domain,
-                "id": record["id"]
-            }
-            
+            data = {}
+
+            if "name" in record:
+                data["name"] = record["name"]
             if "type" in record:
                 data["type"] = record["type"]
             if "content" in record:
                 data["content"] = record["content"]
             if "ttl" in record:
                 data["ttl"] = str(record["ttl"])
-            
-            result = asyncio.run(make_request("dns/update", data))
+
+            result = asyncio.run(make_request(f"dns/edit/{domain}/{record['id']}", data))
             click.echo(f"Updated record {record['id']}: {result}")
     else:
         # Single record update
@@ -282,19 +281,16 @@ def update_record(domain, records=None, record_id=None, record_type=None, conten
             click.echo("Error: At least one of content or TTL is required")
             return 1
         
-        data = {
-            "domain": domain,
-            "id": record_id
-        }
-        
+        data = {}
+
         if record_type:
             data["type"] = record_type
         if content:
             data["content"] = content
         if ttl:
             data["ttl"] = str(ttl)
-        
-        result = asyncio.run(make_request("dns/update", data))
+
+        result = asyncio.run(make_request(f"dns/edit/{domain}/{record_id}", data))
         click.echo(result)
     
     return 0
@@ -520,7 +516,7 @@ def status(domain: str):
         raise click.BadParameter("Invalid domain format")
         
     try:
-        result = asyncio.run(make_request(f"dns/getDNSSEC/{domain}", {}))
+        result = asyncio.run(make_request(f"dns/getDnssecRecords/{domain}", {}))
         if result.get('status') == 'SUCCESS':
             # Display DNSSEC status
             if result.get('dnssec') == '1':
@@ -559,37 +555,8 @@ def enable(domain: str):
     """Enable DNSSEC for a domain"""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
-        
-    try:
-        result = asyncio.run(make_request(f"dns/enableDNSSEC/{domain}", {}))
-        if result.get('status') == 'SUCCESS':
-            console.print(f"[success]DNSSEC enabled successfully for {domain}[/]")
-            
-            # Display DS records for setup with registrar
-            console.print("\n[bold]DS Records to provide to your registrar:[/]")
-            ds_records = result.get('ds_records', [])
-            if ds_records:
-                table = Table()
-                table.add_column("Key Tag", style="cyan")
-                table.add_column("Algorithm", style="magenta")
-                table.add_column("Digest Type", style="yellow")
-                table.add_column("Digest", style="green")
-                
-                for record in ds_records:
-                    table.add_row(
-                        record.get('key_tag', ''),
-                        record.get('algorithm', ''),
-                        record.get('digest_type', ''),
-                        record.get('digest', '')
-                    )
-                
-                console.print(table)
-        else:
-            console.print(f"[error]Error enabling DNSSEC: {result.get('message', 'Unknown error')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error: {str(e)}[/]")
-        ctx = click.get_current_context()
-        ctx.exit(1)
+
+    raise click.ClickException("DNSSEC create requires keyTag, alg, digestType and digest. Add these options or manage DNSSEC in the dashboard: https://porkbun.com/account")
 
 @dnssec.command()
 @click.argument('domain')
@@ -597,17 +564,8 @@ def disable(domain: str):
     """Disable DNSSEC for a domain"""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
-        
-    try:
-        result = asyncio.run(make_request(f"dns/disableDNSSEC/{domain}", {}))
-        if result.get('status') == 'SUCCESS':
-            console.print(f"[success]DNSSEC disabled successfully for {domain}[/]")
-        else:
-            console.print(f"[error]Error disabling DNSSEC: {result.get('message', 'Unknown error')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error: {str(e)}[/]")
-        ctx = click.get_current_context()
-        ctx.exit(1)
+
+    raise click.ClickException("DNSSEC delete requires a keyTag. Provide it or manage DNSSEC in the dashboard: https://porkbun.com/account")
 
 @dnssec.command()
 @click.argument('domain')
@@ -615,46 +573,5 @@ def rotate_keys(domain: str):
     """Rotate DNSSEC keys for a domain"""
     if not validate_domain(domain):
         raise click.BadParameter("Invalid domain format")
-        
-    try:
-        # First check the current status
-        status_result = asyncio.run(make_request(f"dns/getDNSSEC/{domain}", {}))
-        if status_result.get('dnssec') != '1':
-            console.print(f"[warning]DNSSEC is not enabled for {domain}. Enabling it first.[/]")
-            
-        # Disable DNSSEC
-        disable_result = asyncio.run(make_request(f"dns/disableDNSSEC/{domain}", {}))
-        if disable_result.get('status') != 'SUCCESS':
-            console.print(f"[error]Error disabling DNSSEC: {disable_result.get('message')}[/]")
-            return
-            
-        # Enable DNSSEC again with new keys
-        enable_result = asyncio.run(make_request(f"dns/enableDNSSEC/{domain}", {}))
-        if enable_result.get('status') == 'SUCCESS':
-            console.print(f"[success]DNSSEC keys rotated successfully for {domain}[/]")
-            
-            # Display new DS records
-            console.print("\n[bold]New DS Records to provide to your registrar:[/]")
-            ds_records = enable_result.get('ds_records', [])
-            if ds_records:
-                table = Table()
-                table.add_column("Key Tag", style="cyan")
-                table.add_column("Algorithm", style="magenta")
-                table.add_column("Digest Type", style="yellow")
-                table.add_column("Digest", style="green")
-                
-                for record in ds_records:
-                    table.add_row(
-                        record.get('key_tag', ''),
-                        record.get('algorithm', ''),
-                        record.get('digest_type', ''),
-                        record.get('digest', '')
-                    )
-                
-                console.print(table)
-        else:
-            console.print(f"[error]Error enabling new DNSSEC keys: {enable_result.get('message')}[/]")
-    except Exception as e:
-        console.print(f"[error]Error: {str(e)}[/]")
-        ctx = click.get_current_context()
-        ctx.exit(1)
+
+    raise click.ClickException("DNSSEC create requires keyTag, alg, digestType and digest. Add these options or manage DNSSEC in the dashboard: https://porkbun.com/account")

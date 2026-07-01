@@ -1,4 +1,5 @@
 import click
+import asyncio
 import dns.resolver
 import requests
 import time
@@ -110,9 +111,9 @@ def propagation(domain: str, record_type: str, nameservers: List[str],
     try:
         # Get default nameservers if none specified
         if not nameservers:
-            ns_result = make_request(f"dns/retrieveNameServers/{domain}", {})
+            ns_result = asyncio.run(make_request(f"domain/getNs/{domain}", {}))
             if ns_result.get('status') == 'SUCCESS':
-                nameservers = ns_result.get('nameservers', [])
+                nameservers = ns_result.get('ns', ns_result.get('nameservers', []))
             
         if not nameservers:
             console.print("[error]No nameservers found[/]")
